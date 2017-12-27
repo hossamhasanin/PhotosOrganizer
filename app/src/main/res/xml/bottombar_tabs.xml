@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/add_folder"
+        title="New"
+        icon="@drawable/basket"/>
+    <tab
+        id="@+id/take_photo"
+        title="Take photo"
+        icon="@drawable/basket"/>
+    <tab
+        id="@+id/import_image"
+        title="Import"
+        icon="@drawable/basket"/>
+</tabs>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/main_bar_item"
+        android:icon="@drawable/ic_home"
+        android:title="Chose action"></item>
+    <item
+        android:id="@+id/take_photo"
+        android:icon="@drawable/ic_cam"
+        android:title="Take photo"></item>
+    <item
+        android:id="@+id/bar_create_folder"
+        android:icon="@drawable/ic_new_folder"
+        android:title="New"></item>
+    <item
+        android:id="@+id/import_image"
+        android:icon="@drawable/ic_insert_photo"
+        android:title="Imoprt"></item>
+
+</menu>
