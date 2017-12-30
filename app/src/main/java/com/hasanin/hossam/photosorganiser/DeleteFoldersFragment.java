@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+
 import java.util.ArrayList;
 
 /**
@@ -56,12 +58,12 @@ public class DeleteFoldersFragment extends Fragment {
 
         show_files = (RecyclerView) view.findViewById(R.id.show_files);
         indexingDB = new IndexingDB(getActivity());
-        ArrayList<String> all_folders = indexingDB.GetAllFolders();
+        ArrayList<FoldersModel> all_folders = indexingDB.GetAllFolders();
 
         filesRec = new ArrayList();
         //filesRec.add(new FilesRec(0 , ""));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(R.drawable.if_folder_orange_54541 , all_folders.get(i)));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name));
         }
         fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Delete" , fragmentsListener );
         show_files.setAdapter(fileRecAdapter);
@@ -90,49 +92,11 @@ public class DeleteFoldersFragment extends Fragment {
         int item_id = item.getItemId();
         switch (item_id) {
             case R.id.delete_folder_dmenu:
-                Toast.makeText(getActivity(), "Should delete "+fileRecAdapter.ch.size() , Toast.LENGTH_SHORT).show();
-                //new DeleteFoldersTask().execute();
-                //for (int i=1;i<3;i++){
-                //int c = 0;
-               // while (c < fileRecAdapter.ch.size()) {
                 fileRecAdapter.DeleteFolder();
-                 //   Toast.makeText(getActivity() , fileRecAdapter.ch.get(c).toString() , Toast.LENGTH_SHORT).show();
-                   // c++;
-                //}
-//                int i = 0;
-//                while (i < ps.size()){
-//                    fileRecAdapter.filesRec.remove(ps.get(i));
-//                    fileRecAdapter.notifyItemRemoved(ps.get(i));
-//                    i++;
-//                }
-                //fileRecAdapter.ch.clear();
-//                int f = 0;
-//                while (f < ps.size()){
-//                    fileRecAdapter.notifyItemRemoved(ps.get(f));
-//                    f++;
-//                }
-                //}
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /*public class DeleteFoldersTask extends AsyncTask<String , String , String>{
-        int p;
-        String g;
-        @Override
-        protected String doInBackground(String... params) {
-
-            for (int i=1;i<3;i++){
-                p = Integer.parseInt(fileRecAdapter.ch.get(i).toString());
-                g = filesRec.get(p).file_name;
-                indexingDB.DeleteFolders(g);
-                fileRecAdapter.ch.remove(i);
-                filesRec.remove(p);
-                fileRecAdapter.notifyItemRemoved(p);
-            }
-            return null;
-        }
-    }*/
 
 }

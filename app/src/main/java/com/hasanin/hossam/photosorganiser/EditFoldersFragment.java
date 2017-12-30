@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+
 import java.util.ArrayList;
 
 /**
@@ -32,7 +34,7 @@ public class EditFoldersFragment extends Fragment {
     FragmentsListener fragmentsListener;
     ArrayList future_positions;
     IndexingDB indexingDB;
-    ArrayList<String> all_folders;
+    ArrayList<FoldersModel> all_folders;
     FileRecAdapter fileRecAdapter;
 
     public void setFuturePositions(ArrayList future_position){
@@ -45,15 +47,12 @@ public class EditFoldersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_folders , container , false);
         this.setHasOptionsMenu(true);
-        //getActivity().getActionBar().setTitle("Delete");
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(android.R.drawable.ic_delete);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getActivity() , "kokokoo" , Toast.LENGTH_LONG).show();
-                //getActivity().onBackPressed();
                 new helpers().MoveTo(getActivity() , "Main" , null);
             }
         });
@@ -61,11 +60,10 @@ public class EditFoldersFragment extends Fragment {
         show_files = (RecyclerView) view.findViewById(R.id.show_files);
         indexingDB = new IndexingDB(getActivity());
         all_folders = indexingDB.GetAllFolders();
-
         filesRec = new ArrayList();
         //filesRec.add(new FilesRec(0 , ""));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(R.drawable.if_folder_orange_54541 , all_folders.get(i)));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name));
         }
         fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Edit" , fragmentsListener);
         show_files.setAdapter(fileRecAdapter);
@@ -82,9 +80,6 @@ public class EditFoldersFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Edit");
-
-        //actionBar.setDisplayHomeAsUpEnabled(true);
-        //actionBar.setHomeButtonEnabled(true);
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -99,12 +94,11 @@ public class EditFoldersFragment extends Fragment {
             case R.id.delete_folder_emenu:
                 int p = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
                 String g = filesRec.get(p).file_name;
-                Toast.makeText(getActivity(), "Will take + "+g , Toast.LENGTH_LONG).show();
                 indexingDB.DeleteFolders(g);
                 fileRecAdapter.ch.remove(0);
                 filesRec.remove(p);
                 fileRecAdapter.notifyItemRemoved(p);
-
+                Toast.makeText(getActivity(), "Deleted successfully !", Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);

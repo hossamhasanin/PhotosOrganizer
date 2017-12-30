@@ -72,7 +72,7 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
         final Animation folder_jump = AnimationUtils.loadAnimation(context , R.anim.folder_jumpup);
         final FileRecAdapter fileRecAdapter = this;
         if (position == 0 && frag == "Main") {
-            holder.file_im.setImageResource(R.drawable.new_folder_light_blue);
+            holder.file_im.setImageResource(R.drawable.if_new_folder_red);
             holder.file_name.setText("New");
             holder.file_im.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,7 +95,6 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                 if (Integer.toString(position) == future_positions.get(0) && future_positions.get(0) != null && frag == "Edit" && future_positions.size() == 1){
                     holder.delete_folder.setChecked(true);
                     ch.add(future_positions.get(0));
-                    Toast.makeText(context, "Size "+ch.size(), Toast.LENGTH_SHORT).show();
                 }
                 if (frag == "Delete" && future_positions.size() == 2){
                     if (Integer.toString(position) == future_positions.get(0)) {
@@ -105,29 +104,34 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                         holder.delete_folder.setChecked(true);
                         ch.add(future_positions.get(1));
                     }
-                    Toast.makeText(context, "Size "+ch.size(), Toast.LENGTH_SHORT).show();
                 }
                 holder.delete_folder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked == true){
                             ch.add(Integer.toString(position));
-                            Toast.makeText(context, "Element " + position + " is checked "+ ch.size(), Toast.LENGTH_SHORT).show();
                             if (frag == "Edit" && ch.size() == 2){
                                 fragmentsListener.OnMoveToListener(1 , ch);
                             }
                         } else if (isChecked == false) {
                             ch.remove(Integer.toString(position));
-                            //Toast.makeText(context , "Element "+position+" is unchecked" , Toast.LENGTH_SHORT).show();
-                            //Toast.makeText(context , "s = "+ch.size() , Toast.LENGTH_SHORT).show();
                             if (frag == "Delete" && ch.size() == 1){
-                                //context.onBackPressed();
                                 new helpers().MoveTo(context , "Edit" , ch.get(0).toString());
                             }
                             if (ch.size() == 0){
-                                //context.onBackPressed();
                                 new helpers().MoveTo(context , "Main" , null);
                             }
+                        }
+                    }
+                });
+
+                holder.folder_card.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (holder.delete_folder.isChecked()){
+                            holder.delete_folder.setChecked(false);
+                        } else {
+                            holder.delete_folder.setChecked(true);
                         }
                     }
                 });
@@ -136,17 +140,11 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                 holder.folder_card.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        //g = 1;
-                        //holder.delete_folder.setChecked(true);
-                        //notifyDataSetChanged();
                         fragmentsListener.OnPositionListener(position-1);
                         return false;
                     }
                 });
 
-//                if (g == 1) {
-//                    holder.delete_folder.setVisibility(View.VISIBLE);
-//                }
                 holder.folder_card.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -169,8 +167,8 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
             } catch (NullPointerException e) {
                 System.out.println(e);
             }
-            Toast.makeText(context, go, Toast.LENGTH_SHORT).show();
         }
+        Toast.makeText(context, "Deleted successfully !", Toast.LENGTH_SHORT).show();
         if (ch.size() != filesRec.size()) {
             new helpers().MoveTo(context, "Edit", null);
         } else {

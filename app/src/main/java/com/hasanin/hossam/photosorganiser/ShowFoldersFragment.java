@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+
 import java.util.ArrayList;
 
 /**
@@ -42,12 +44,11 @@ public class ShowFoldersFragment extends Fragment {
         toolbar.setNavigationIcon(null);
         show_files = (RecyclerView) view.findViewById(R.id.show_files);
         indexingDB = new IndexingDB(getActivity());
-        ArrayList<String> all_folders = indexingDB.GetAllFolders();
-
+        ArrayList<FoldersModel> all_folders = indexingDB.GetAllFolders();
         filesRec = new ArrayList();
         filesRec.add(new FilesRec(0 , ""));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(R.drawable.if_folder_orange_54541 , all_folders.get(i)));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name));
         }
         ArrayList positions = new ArrayList();
         positions.add(Integer.toString(0));

@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+
 import java.util.ArrayList;
 
 /**
@@ -31,13 +33,13 @@ public class IndexingDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean InsertNewFolder (String folder_name){
+    public boolean InsertNewFolder (String folder_name , int icon){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("name",folder_name);
         contentValues.put("type" , 0);
         contentValues.put("place" , 0);
-        contentValues.put("uri" , "non");
+        contentValues.put("uri" , Integer.toString(icon));
         Long result = db.insert("container" , null , contentValues);
         if (result == 1){
             return true;
@@ -46,14 +48,14 @@ public class IndexingDB extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<String> GetAllFolders (){
-        ArrayList<String> all_folders = new ArrayList<String>();
+    public ArrayList<FoldersModel> GetAllFolders (){
+        ArrayList<FoldersModel> all_folders = new ArrayList<FoldersModel>();
         SQLiteDatabase db = this.getReadableDatabase();
         // type = 0 means folder
         Cursor data = db.rawQuery("SELECT * FROM container WHERE type = 0", null);
         data.moveToFirst();
         while (data.isAfterLast() == false){
-            all_folders.add(data.getString(data.getColumnIndex("name")));
+            all_folders.add(new FoldersModel(data.getString(data.getColumnIndex("name")) , Integer.parseInt(data.getString(data.getColumnIndex("uri")))));
             data.moveToNext();
         }
         return all_folders;
