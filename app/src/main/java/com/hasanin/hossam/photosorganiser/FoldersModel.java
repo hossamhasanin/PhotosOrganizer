@@ -7,8 +7,10 @@ package com.hasanin.hossam.photosorganiser;
 public class FoldersModel {
     public String icon_name;
     public int icon;
-    public FoldersModel(String icon_name , int icon){
+    public int id;
+    public FoldersModel(String icon_name , int icon , int id){
         this.icon_name = icon_name;
         this.icon = icon;
+        this.id = id;
     }
 }

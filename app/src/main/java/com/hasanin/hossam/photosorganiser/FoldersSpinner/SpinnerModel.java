@@ -1,4 +1,4 @@
-package com.hasanin.hossam.photosorganiser.PopUpSpinner;
+package com.hasanin.hossam.photosorganiser.FoldersSpinner;
 
 /**
  * Created by mohamed on 30/12/2017.

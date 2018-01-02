@@ -1,7 +1,6 @@
-package com.hasanin.hossam.photosorganiser.PopUpSpinner;
+package com.hasanin.hossam.photosorganiser.FoldersSpinner;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -13,21 +12,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hasanin.hossam.photosorganiser.FoldersModel;
 import com.hasanin.hossam.photosorganiser.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by mohamed on 30/12/2017.
  */
 
-public class PopUpSpinnerArrayAdapter extends ArrayAdapter<SpinnerModel> {
+public class FoldersSpinnerArrayAdapter extends ArrayAdapter<SpinnerModel> {
     Activity context;
-    ArrayList<SpinnerModel> FolderIcons;
+    ArrayList<FoldersModel> FolderIcons;
     LayoutInflater layoutInflater;
 
-    public PopUpSpinnerArrayAdapter(@NonNull Activity context, @LayoutRes int resource, @IdRes int textViewResourceId, @NonNull ArrayList<SpinnerModel> FolderIcons) {
+    public FoldersSpinnerArrayAdapter(@NonNull Activity context, @LayoutRes int resource, @IdRes int textViewResourceId, @NonNull ArrayList FolderIcons) {
         super(context, resource, textViewResourceId, FolderIcons);
         this.FolderIcons = FolderIcons;
         layoutInflater = context.getLayoutInflater();

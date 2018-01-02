@@ -11,8 +11,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.hasanin.hossam.photosorganiser.PopUpSpinner.PopUpSpinnerArrayAdapter;
-import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -37,20 +37,20 @@ public class helpers {
         ad = popupmess.show();
         folder_icons = (Spinner) poplayout.findViewById(R.id.popup_spinner);
 
-        final ArrayList<SpinnerModel> FolderIcons = new ArrayList<SpinnerModel>();
-        FolderIcons.add(new SpinnerModel("random" , R.drawable.if_help_mark_query_question_support_talk));
-        FolderIcons.add(new SpinnerModel("acorn" , R.drawable.if_acorn));
-        FolderIcons.add(new SpinnerModel("adim" , R.drawable.if_adium));
-        FolderIcons.add(new SpinnerModel("coda" , R.drawable.if_coda));
-        FolderIcons.add(new SpinnerModel("deviant" , R.drawable.if_deviant));
-        FolderIcons.add(new SpinnerModel("indesign" , R.drawable.if_indesign));
-        FolderIcons.add(new SpinnerModel("front row" , R.drawable.if_front_row));
-        FolderIcons.add(new SpinnerModel("inkscape" , R.drawable.if_inkscape));
-        FolderIcons.add(new SpinnerModel("the pirate" , R.drawable.if_thepirate));
+        final ArrayList<FoldersModel> FolderIcons = new ArrayList<FoldersModel>();
+        FolderIcons.add(new FoldersModel("random" , R.drawable.if_help_mark_query_question_support_talk , 0));
+        FolderIcons.add(new FoldersModel("acorn" , R.drawable.if_acorn , 0));
+        FolderIcons.add(new FoldersModel("adim" , R.drawable.if_adium , 0));
+        FolderIcons.add(new FoldersModel("coda" , R.drawable.if_coda , 0));
+        FolderIcons.add(new FoldersModel("deviant" , R.drawable.if_deviant , 0));
+        FolderIcons.add(new FoldersModel("indesign" , R.drawable.if_indesign , 0));
+        FolderIcons.add(new FoldersModel("front row" , R.drawable.if_front_row , 0));
+        FolderIcons.add(new FoldersModel("inkscape" , R.drawable.if_inkscape , 0));
+        FolderIcons.add(new FoldersModel("the pirate" , R.drawable.if_thepirate , 0));
 
-        PopUpSpinnerArrayAdapter popUpSpinnerArrayAdapter = new PopUpSpinnerArrayAdapter(context , R.layout.popup_spinner_layout , R.id
+        FoldersSpinnerArrayAdapter foldersSpinnerArrayAdapter = new FoldersSpinnerArrayAdapter(context , R.layout.popup_spinner_layout , R.id
                 .chosen_folder_icon_name, FolderIcons);
-        folder_icons.setAdapter(popUpSpinnerArrayAdapter);
+        folder_icons.setAdapter(foldersSpinnerArrayAdapter);
         selected_icon = 0;
         folder_icons.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

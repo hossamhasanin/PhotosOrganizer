@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
 
 import java.util.ArrayList;
 
@@ -49,7 +47,7 @@ public class EditFoldersFragment extends Fragment {
         this.setHasOptionsMenu(true);
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(android.R.drawable.ic_delete);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

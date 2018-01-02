@@ -5,8 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 
-import com.hasanin.hossam.photosorganiser.PopUpSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
 
 import java.util.ArrayList;
 
@@ -48,6 +49,22 @@ public class IndexingDB extends SQLiteOpenHelper {
         }
     }
 
+    public boolean InsertNewImage (String image_name , Uri image , int place){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("name",image_name);
+        contentValues.put("type" , 1);
+        contentValues.put("place" , place);
+        contentValues.put("uri" , String.valueOf(image));
+        Long result = db.insert("container" , null , contentValues);
+        if (result == 1){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
     public ArrayList<FoldersModel> GetAllFolders (){
         ArrayList<FoldersModel> all_folders = new ArrayList<FoldersModel>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -55,7 +72,7 @@ public class IndexingDB extends SQLiteOpenHelper {
         Cursor data = db.rawQuery("SELECT * FROM container WHERE type = 0", null);
         data.moveToFirst();
         while (data.isAfterLast() == false){
-            all_folders.add(new FoldersModel(data.getString(data.getColumnIndex("name")) , Integer.parseInt(data.getString(data.getColumnIndex("uri")))));
+            all_folders.add(new FoldersModel(data.getString(data.getColumnIndex("name")) , Integer.parseInt(data.getString(data.getColumnIndex("uri"))) , data.getInt(data.getColumnIndex("id")) ));
             data.moveToNext();
         }
         return all_folders;

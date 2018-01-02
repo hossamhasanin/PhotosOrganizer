@@ -3,6 +3,8 @@ package com.hasanin.hossam.photosorganiser;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenu;
@@ -20,7 +22,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements FragmentsListener {
 
+    int GET_IMAGE_CODE = 100;
+    int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
 
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
         getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
 
         final Activity context = this;
-        final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottombar);
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottombar);
         BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -40,10 +45,15 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
                     case R.id.bar_create_folder:
                         Toast.makeText(getApplicationContext() , "Create folder" , Toast.LENGTH_SHORT).show();
                         new helpers().CreateNewFolder(context , FileRecAdapter.filesRec , FileRecAdapter.getInstance() , true , bottomNavigationView);
+                        break;
                     case R.id.take_photo :
                         Toast.makeText(getApplicationContext() , "take photo" , Toast.LENGTH_SHORT).show();
+                        break;
                     case R.id.import_image:
                         Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                        startActivityForResult(intent , GET_IMAGE_CODE);
+                        break;
                 }
 
                 return true;
@@ -51,6 +61,26 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
         });
 
 
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GET_IMAGE_CODE && resultCode == RESULT_OK){
+            Intent intent = new Intent(this , ImportImage.class);
+            Bundle b = new Bundle();
+            b.putString("image" , String.valueOf(data.getData()));
+            intent.putExtras(b);
+            startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
+        } else if (requestCode == SAVE_IMAGE_IN_DATATBASE_CODE){
+            if (data.getExtras().getInt("success") == 1)
+                Toast.makeText(getApplicationContext() , "Saved the image successfully!" , Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext() , "Didn't save the image!" , Toast.LENGTH_SHORT).show();
+            bottomNavigationView.setSelectedItemId(R.id.main_bar_item);
+        }
 
     }
 
@@ -82,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
         }
     }
 
-//    @Override
+    //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.main_menu , menu);
 //        return super.onCreateOptionsMenu(menu);
