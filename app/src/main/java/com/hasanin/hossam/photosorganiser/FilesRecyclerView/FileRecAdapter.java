@@ -1,7 +1,10 @@
-package com.hasanin.hossam.photosorganiser;
+package com.hasanin.hossam.photosorganiser.FilesRecyclerView;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -12,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -20,6 +22,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.hasanin.hossam.photosorganiser.MainActivity;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FragmentsListener;
+import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.R;
+import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
 
 import java.util.ArrayList;
 
@@ -65,7 +74,7 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
     public IndexingDB indexingDB;
     public ArrayList ch = new ArrayList();
     // this var is used as flag to ensure if the user has used long click so that make checkboxes visible
-    public String g;
+    public int g;
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
@@ -149,6 +158,24 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                     @Override
                     public void onClick(View v) {
                         holder.file_im.startAnimation(folder_jump);
+                        try {
+                            Thread.sleep(350);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if((int) Build.VERSION.SDK_INT >= 23){
+                            if (ActivityCompat.checkSelfPermission(context , android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                                g = position;
+                                ActivityCompat.requestPermissions(context ,new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE} , 400);
+                            } else {
+                                Intent intent = new Intent(context , ShowImages.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("folder_id" , filesRec.get(position).id);
+                                bundle.putString("folder_name" , filesRec.get(position).file_name);
+                                intent.putExtras(bundle);
+                                context.startActivity(intent);
+                            }
+                        }
                     }
                 });
             }
@@ -163,7 +190,7 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
             Integer p = Integer.parseInt(ch.get(i).toString());
             String go = filesRec.get(p).file_name;
             try {
-                indexingDB.DeleteFolders(go);
+                indexingDB.DeleteFolders(go , filesRec.get(p).id);
             } catch (NullPointerException e) {
                 System.out.println(e);
             }

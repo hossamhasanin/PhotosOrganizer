@@ -1,9 +1,12 @@
-package com.hasanin.hossam.photosorganiser;
+package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,7 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
+import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.R;
+import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
 
 import java.util.ArrayList;
 
@@ -46,9 +55,9 @@ public class ShowFoldersFragment extends Fragment {
         indexingDB = new IndexingDB(getActivity());
         ArrayList<FoldersModel> all_folders = indexingDB.GetAllFolders();
         filesRec = new ArrayList();
-        filesRec.add(new FilesRec(0 , ""));
+        filesRec.add(new FilesRec(0 , "" , 0));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id));
         }
         ArrayList positions = new ArrayList();
         positions.add(Integer.toString(0));
@@ -81,6 +90,19 @@ public class ShowFoldersFragment extends Fragment {
             helpers.CreateNewFolder(getActivity() , filesRec , fileRecAdapter , false , (BottomNavigationView) null);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 300:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                } else {
+
+                }
+        }
     }
 
     @Override

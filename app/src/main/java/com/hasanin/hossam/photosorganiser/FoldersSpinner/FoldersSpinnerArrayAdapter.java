@@ -12,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.hasanin.hossam.photosorganiser.FoldersModel;
 import com.hasanin.hossam.photosorganiser.R;
 
 import java.util.ArrayList;

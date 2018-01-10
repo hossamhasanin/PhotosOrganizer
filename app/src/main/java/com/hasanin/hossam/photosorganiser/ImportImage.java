@@ -15,8 +15,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
-import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
 
 import java.util.ArrayList;
 

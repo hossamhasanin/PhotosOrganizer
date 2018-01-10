@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
-import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
+import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 
 import java.util.ArrayList;
 
@@ -78,10 +79,40 @@ public class IndexingDB extends SQLiteOpenHelper {
         return all_folders;
     }
 
+    public ArrayList<ImagesRecModel> GetAllImages (String place){
+        ArrayList<ImagesRecModel> all_images = new ArrayList<ImagesRecModel>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        // type = 0 means folder
+        Cursor data = db.rawQuery("SELECT * FROM container WHERE type = 1 AND place = " + "'" +place+ "'", null);
+        data.moveToFirst();
+        while (data.isAfterLast() == false){
+            all_images.add(new ImagesRecModel(Uri.parse(data.getString(data.getColumnIndex("uri"))) , data.getString(data.getColumnIndex("name")) , data.getInt(data.getColumnIndex("id")) ));
+            data.moveToNext();
+        }
+        return all_images;
+    }
 
-    public void DeleteFolders(String name){
+    public int GetLastRecordId(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor data = db.rawQuery("SELECT * FROM container order by id desc limit 1", null);
+        data.moveToFirst();
+        return data.getInt(data.getColumnIndex("id"));
+    }
+
+    public void DeleteImagesByItsPlace(String place){
         SQLiteDatabase db = this.getWritableDatabase();
         try {
+            db.execSQL("DELETE FROM container WHERE place = " + "'" +place+ "'");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+
+    public void DeleteFolders(String name , int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            DeleteImagesByItsPlace(Integer.toString(id));
             db.execSQL("DELETE FROM container WHERE name = " + "'" +name+ "'");
         }catch (Exception e){
             System.out.println(e);

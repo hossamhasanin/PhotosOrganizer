@@ -1,4 +1,4 @@
-package com.hasanin.hossam.photosorganiser;
+package com.hasanin.hossam.photosorganiser.Helper;
 
 import android.app.Activity;
 import android.support.design.widget.BottomNavigationView;
@@ -11,8 +11,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
-import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragment;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
+import com.hasanin.hossam.photosorganiser.R;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -79,7 +85,8 @@ public class helpers {
                     if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                         selected_icon = GetRandomChoice(ImageFolders);
                     indexingDB.InsertNewFolder(fn , selected_icon);
-                    filesRec.add(fp ,new FilesRec(selected_icon , fn));
+                    int id = indexingDB.GetLastRecordId();
+                    filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
                     // To add the new item to the list to make it show
                     fileRecAdapter.notifyItemInserted(fp);
                 }

@@ -1,29 +1,37 @@
 package com.hasanin.hossam.photosorganiser;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenu;
-import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.lang.reflect.Field;
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
+import com.hasanin.hossam.photosorganiser.Helper.BottomNavigationViewHelper;
+import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.DeleteFoldersFragment;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragment;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FragmentsListener;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
+import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
+
 import java.util.ArrayList;
+import java.util.jar.Manifest;
 
 public class MainActivity extends AppCompatActivity implements FragmentsListener {
 
     int GET_IMAGE_CODE = 100;
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
+    private static final int REQUEST_STORAGE_PERM_FROM_BAR = 300;
+    private static final int REQUEST_STORAGE_PERM_FROM_RECYC = 400;
 
     BottomNavigationView bottomNavigationView;
 
@@ -50,9 +58,14 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
                         Toast.makeText(getApplicationContext() , "take photo" , Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.import_image:
-                        Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                        startActivityForResult(intent , GET_IMAGE_CODE);
+                        if((int) Build.VERSION.SDK_INT >= 23){
+                            if (ActivityCompat.checkSelfPermission(context , android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                                    ActivityCompat.requestPermissions(context ,new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE} , REQUEST_STORAGE_PERM_FROM_BAR);
+                            } else {
+                                MoveToShowImagesActivity();
+                            }
+                        }
+
                         break;
                 }
 
@@ -62,6 +75,31 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
 
 
 
+    }
+
+    public void MoveToShowImagesActivity(){
+        Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        startActivityForResult(intent , GET_IMAGE_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQUEST_STORAGE_PERM_FROM_BAR:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    bottomNavigationView.setSelectedItemId(R.id.main_bar_item);
+                } else {
+                    Toast.makeText(getApplicationContext() , "Permission denied!" , Toast.LENGTH_SHORT).show();
+                }
+            case REQUEST_STORAGE_PERM_FROM_RECYC:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                } else {
+                    Toast.makeText(getApplicationContext() , "Permission denied!" , Toast.LENGTH_SHORT).show();
+                }
+        }
     }
 
     @Override

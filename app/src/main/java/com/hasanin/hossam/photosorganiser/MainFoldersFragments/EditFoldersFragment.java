@@ -1,6 +1,7 @@
-package com.hasanin.hossam.photosorganiser;
+package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,57 +14,61 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.hasanin.hossam.photosorganiser.FoldersSpinner.SpinnerModel;
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
+import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
+import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.R;
+import com.hasanin.hossam.photosorganiser.Helper.helpers;
 
 import java.util.ArrayList;
 
 /**
- * Created by mohamed on 03/12/2017.
+ * Created by mohamed on 17/11/2017.
  */
 
-public class DeleteFoldersFragment extends Fragment {
+public class EditFoldersFragment extends Fragment {
 
     public RecyclerView show_files;
     ArrayList<FilesRec> filesRec;
     GridLayoutManager gridLayoutManager;
     FragmentsListener fragmentsListener;
     ArrayList future_positions;
-    FileRecAdapter fileRecAdapter;
     IndexingDB indexingDB;
+    ArrayList<FoldersModel> all_folders;
+    FileRecAdapter fileRecAdapter;
 
-    public void setFuture_positions(ArrayList future_positions){
-        this.future_positions = future_positions;
+    public void setFuturePositions(ArrayList future_position){
+        this.future_positions = future_position;
     }
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_folders , container , false);
         this.setHasOptionsMenu(true);
-        //getActivity().getActionBar().setTitle("Delete");
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(android.R.drawable.ic_delete);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getActivity() , "kokokoo" , Toast.LENGTH_LONG).show();
-                //getActivity().onBackPressed();
                 new helpers().MoveTo(getActivity() , "Main" , null);
             }
         });
 
         show_files = (RecyclerView) view.findViewById(R.id.show_files);
         indexingDB = new IndexingDB(getActivity());
-        ArrayList<FoldersModel> all_folders = indexingDB.GetAllFolders();
-
+        all_folders = indexingDB.GetAllFolders();
         filesRec = new ArrayList();
         //filesRec.add(new FilesRec(0 , ""));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id));
         }
-        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Delete" , fragmentsListener );
+        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Edit" , fragmentsListener);
         show_files.setAdapter(fileRecAdapter);
         if(getActivity().getApplicationContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridLayoutManager = new GridLayoutManager(getActivity() , 4);
@@ -77,11 +82,11 @@ public class DeleteFoldersFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle("Delete");
+        getActivity().setTitle("Edit");
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.delete_folder_menu , menu);
+        inflater.inflate(R.menu.edit_folder_menu , menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -89,12 +94,24 @@ public class DeleteFoldersFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int item_id = item.getItemId();
         switch (item_id) {
-            case R.id.delete_folder_dmenu:
-                fileRecAdapter.DeleteFolder();
+            case R.id.delete_folder_emenu:
+                int p = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
+                String g = filesRec.get(p).file_name;
+                indexingDB.DeleteFolders(g , filesRec.get(p).id);
+                fileRecAdapter.ch.remove(0);
+                filesRec.remove(p);
+                fileRecAdapter.notifyItemRemoved(p);
+                Toast.makeText(getActivity(), "Deleted successfully !", Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            fragmentsListener = (FragmentsListener) context;
+        }catch (Exception e){}
+    }
 }
