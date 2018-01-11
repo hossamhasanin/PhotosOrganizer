@@ -28,6 +28,7 @@ import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FragmentsListener
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
 
 import java.util.ArrayList;
@@ -168,12 +169,18 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                                 g = position;
                                 ActivityCompat.requestPermissions(context ,new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE} , 400);
                             } else {
-                                Intent intent = new Intent(context , ShowImages.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putInt("folder_id" , filesRec.get(position).id);
-                                bundle.putString("folder_name" , filesRec.get(position).file_name);
-                                intent.putExtras(bundle);
-                                context.startActivity(intent);
+                                indexingDB = new IndexingDB(context);
+                                ArrayList<ImagesRecModel> folder_is_empty = indexingDB.GetAllImages(Integer.toString(filesRec.get(position).id));
+                                if (folder_is_empty.size() > 0) {
+                                    Intent intent = new Intent(context, ShowImages.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putInt("folder_id", filesRec.get(position).id);
+                                    bundle.putString("folder_name", filesRec.get(position).file_name);
+                                    intent.putExtras(bundle);
+                                    context.startActivity(intent);
+                                } else {
+                                    Toast.makeText(context , "There is no images inside!" , Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     }

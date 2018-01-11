@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -102,6 +103,9 @@ public class EditFoldersFragment extends Fragment {
                 filesRec.remove(p);
                 fileRecAdapter.notifyItemRemoved(p);
                 Toast.makeText(getActivity(), "Deleted successfully !", Toast.LENGTH_SHORT).show();
+            case R.id.edit_folder_name:
+                int pos = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
+                new helpers().EditFolder(getActivity() ,filesRec, fileRecAdapter , filesRec.get(pos).file_name , filesRec.get(pos).file_im);
         }
 
         return super.onOptionsItemSelected(item);

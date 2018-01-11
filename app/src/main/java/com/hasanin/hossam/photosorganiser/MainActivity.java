@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
+import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.Helper.BottomNavigationViewHelper;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.DeleteFoldersFragment;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
     private static final int REQUEST_STORAGE_PERM_FROM_RECYC = 400;
 
     BottomNavigationView bottomNavigationView;
+    ArrayList<FoldersModel> folders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
+
+        IndexingDB indexingDB = new IndexingDB(this);
+        folders = indexingDB.GetAllFolders();
 
         final Activity context = this;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottombar);
@@ -59,10 +64,20 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
                         break;
                     case R.id.import_image:
                         if((int) Build.VERSION.SDK_INT >= 23){
-                            if (ActivityCompat.checkSelfPermission(context , android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                                    ActivityCompat.requestPermissions(context ,new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE} , REQUEST_STORAGE_PERM_FROM_BAR);
+                            if (folders.size() != 0) {
+                                if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(context, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERM_FROM_BAR);
+                                } else {
+                                    MoveToShowImagesActivity();
+                                }
                             } else {
+                                Toast.makeText(getApplicationContext() , "There is no folders , create one to put image" , Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            if (folders.size() != 0) {
                                 MoveToShowImagesActivity();
+                            } else {
+                                Toast.makeText(getApplicationContext() , "There is no folders , create one to put image" , Toast.LENGTH_LONG).show();
                             }
                         }
 

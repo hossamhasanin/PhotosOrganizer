@@ -85,7 +85,7 @@ public class helpers {
                     if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                         selected_icon = GetRandomChoice(ImageFolders);
                     indexingDB.InsertNewFolder(fn , selected_icon);
-                    int id = indexingDB.GetLastRecordId();
+                    int id = indexingDB.GetLastRecordId()+1;
                     filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
                     // To add the new item to the list to make it show
                     fileRecAdapter.notifyItemInserted(fp);
@@ -97,6 +97,75 @@ public class helpers {
             }
         });
     }
+
+    public void EditFolder (final Activity context , final ArrayList<FilesRec> filesRec , final FileRecAdapter fileRecAdapter , String f_name , int f_icon){
+        popupmess = new AlertDialog.Builder(context);
+        View poplayout = LayoutInflater.from(context).inflate(R.layout.create_folder_mess , null);
+        popupmess.setView(poplayout);
+        ad = popupmess.show();
+        folder_icons = (Spinner) poplayout.findViewById(R.id.popup_spinner);
+
+        final ArrayList<FoldersModel> FolderIcons = new ArrayList<FoldersModel>();
+        FolderIcons.add(new FoldersModel("random" , R.drawable.if_help_mark_query_question_support_talk , 0));
+        FolderIcons.add(new FoldersModel("acorn" , R.drawable.if_acorn , 0));
+        FolderIcons.add(new FoldersModel("adim" , R.drawable.if_adium , 0));
+        FolderIcons.add(new FoldersModel("coda" , R.drawable.if_coda , 0));
+        FolderIcons.add(new FoldersModel("deviant" , R.drawable.if_deviant , 0));
+        FolderIcons.add(new FoldersModel("indesign" , R.drawable.if_indesign , 0));
+        FolderIcons.add(new FoldersModel("front row" , R.drawable.if_front_row , 0));
+        FolderIcons.add(new FoldersModel("inkscape" , R.drawable.if_inkscape , 0));
+        FolderIcons.add(new FoldersModel("the pirate" , R.drawable.if_thepirate , 0));
+
+        FoldersSpinnerArrayAdapter foldersSpinnerArrayAdapter = new FoldersSpinnerArrayAdapter(context , R.layout.popup_spinner_layout , R.id
+                .chosen_folder_icon_name, FolderIcons);
+        folder_icons.setAdapter(foldersSpinnerArrayAdapter);
+        for (int i=0;i<FolderIcons.size();i++){
+            if (f_icon == FolderIcons.get(i).icon){
+                folder_icons.setSelection(i);
+                selected_icon = f_icon;
+                break;
+            }
+        }
+
+        folder_icons.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selected_icon = FolderIcons.get(position).icon;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        folder_name = (EditText) poplayout.findViewById(R.id.pop_folder_name);
+        folder_name.setText(f_name);
+        Button create_folder = (Button) poplayout.findViewById(R.id.pop_create_folder);
+        indexingDB = new IndexingDB(context);
+        final int[] ImageFolders = {R.drawable.if_acorn , R.drawable.if_adium , R.drawable.if_coda , R.drawable.if_deviant , R.drawable.if_indesign , R.drawable.if_front_row , R.drawable.if_inkscape , R.drawable.if_thepirate};
+        create_folder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!folder_name.getText().toString().isEmpty()){
+                    String fn = folder_name.getText().toString();
+                    Integer fp = filesRec.size();
+                    Toast.makeText(context , fn , Toast.LENGTH_LONG).show();
+                    if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
+                        selected_icon = GetRandomChoice(ImageFolders);
+                    int pos = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
+                    int id = filesRec.get(pos).id;
+                    indexingDB.UpdateFolder(fn , Integer.toString(selected_icon) , Integer.toString(id));
+                    filesRec.set(pos , new FilesRec(selected_icon , fn , id));
+                    fileRecAdapter.notifyItemChanged(pos);
+                    MoveTo(context , "Edit" , fileRecAdapter.ch.get(0).toString());
+                }
+                ad.dismiss();
+            }
+        });
+    }
+
 
     public void MoveTo(Activity context , String frag , String data){
         if (frag == "Main"){

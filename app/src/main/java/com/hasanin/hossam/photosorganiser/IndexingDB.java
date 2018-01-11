@@ -92,11 +92,27 @@ public class IndexingDB extends SQLiteOpenHelper {
         return all_images;
     }
 
+    public boolean FolderIsEmpty(String place){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE type = 1 AND place = " +place , null);
+        data.moveToFirst();
+        if (data.getInt(0) > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public int GetLastRecordId(){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor data = db.rawQuery("SELECT * FROM container order by id desc limit 1", null);
         data.moveToFirst();
         return data.getInt(data.getColumnIndex("id"));
+    }
+
+    public void UpdateFolder(String name , String icon , String id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("update container set name = '"+ name +"' , uri = '"+ icon +"' where type = 0 AND id = " + id);
     }
 
     public void DeleteImagesByItsPlace(String place){
