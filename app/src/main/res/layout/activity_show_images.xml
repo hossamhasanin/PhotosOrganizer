@@ -29,13 +29,13 @@
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_add_white" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/show_images"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/appBarLayout" >
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/show_images"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/appBarLayout">
 
-        </android.support.v7.widget.RecyclerView>
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>

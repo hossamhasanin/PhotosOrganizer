@@ -14,8 +14,10 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hasanin.hossam.photosorganiser.R;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -40,7 +42,8 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.stored_image.setImageURI(imageRec.get(position).image);
+        Glide.with(context).load(imageRec.get(position).image).into(holder.stored_image);
+        //holder.stored_image.setImageURI(imageRec.get(position).image);
         holder.stored_image_name.setText(imageRec.get(position).image_name);
     }
 
