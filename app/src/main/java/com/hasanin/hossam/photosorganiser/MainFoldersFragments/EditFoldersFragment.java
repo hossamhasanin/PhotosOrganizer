@@ -2,10 +2,12 @@ package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +25,8 @@ import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 
@@ -94,16 +98,33 @@ public class EditFoldersFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int item_id = item.getItemId();
-        switch (item_id) {
-            case R.id.delete_folder_emenu:
-                int p = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
-                String g = filesRec.get(p).file_name;
-                indexingDB.DeleteFolders(g , filesRec.get(p).id);
-                fileRecAdapter.ch.remove(0);
-                filesRec.remove(p);
-                fileRecAdapter.notifyItemRemoved(p);
-                Toast.makeText(getActivity(), "Deleted successfully !", Toast.LENGTH_SHORT).show();
-            case R.id.edit_folder_name:
+        if (item_id == R.id.delete_folder_emenu) {
+            final int p = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
+            final String g = filesRec.get(p).file_name;
+            ArrayList<ImagesRecModel> folder_is_empty = indexingDB.GetAllImages(Integer.toString(filesRec.get(p).id));
+            String the_mess_for_im = folder_is_empty.size() > 0 ? " this folder contains images" : "";
+            String alert_message = "Are you sure you want to delete : " + g + " ?" +the_mess_for_im;
+            AlertDialog.Builder al = new helpers().AlertMessage(getActivity(), alert_message, "Delete Folder", R.drawable.ic_delete_basket_black);
+            al.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    indexingDB.DeleteFolders(g, filesRec.get(p).id);
+                    fileRecAdapter.ch.remove(0);
+                    filesRec.remove(p);
+                    fileRecAdapter.notifyItemRemoved(p);
+                    TastyToast.makeText(getActivity(), "Deleted successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
+                    if (fileRecAdapter.getItemCount() ==  0){
+                        new helpers().MoveTo(getActivity() , "Main" , null);
+                    }
+                }
+            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    TastyToast.makeText(getActivity(), "I don't know why you botherd !", TastyToast.LENGTH_LONG, TastyToast.CONFUSING);
+                }
+            });
+            al.show();
+        }else if (item_id == R.id.edit_folder_name){
                 int pos = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
                 new helpers().EditFolder(getActivity() ,filesRec, fileRecAdapter , filesRec.get(pos).file_name , filesRec.get(pos).file_im);
         }

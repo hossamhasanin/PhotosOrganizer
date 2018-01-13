@@ -30,6 +30,7 @@ import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 
@@ -202,7 +203,7 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                 System.out.println(e);
             }
         }
-        Toast.makeText(context, "Deleted successfully !", Toast.LENGTH_SHORT).show();
+        TastyToast.makeText(context, "Deleted successfully , don't regret now !", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
         if (ch.size() != filesRec.size()) {
             new helpers().MoveTo(context, "Edit", null);
         } else {

@@ -19,12 +19,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/lists_container"
-        android:layout_below="@+id/appBarLayout"></RelativeLayout>
+        android:layout_below="@+id/appBarLayout"
+        android:layout_alignBottom="@+id/view"></RelativeLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_above="@+id/bottombar"
-        android:background="@color/bright_gray"></View>
+        android:background="@color/bright_gray"
+        android:id="@+id/view"></View>
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottombar"
         android:layout_width="match_parent"

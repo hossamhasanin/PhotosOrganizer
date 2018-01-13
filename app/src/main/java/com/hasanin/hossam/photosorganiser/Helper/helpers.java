@@ -19,6 +19,7 @@ import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragment;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
 import com.hasanin.hossam.photosorganiser.R;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -81,12 +82,12 @@ public class helpers {
                 if (!folder_name.getText().toString().isEmpty()){
                     String fn = folder_name.getText().toString();
                     Integer fp = filesRec.size();
-                    Toast.makeText(context , fn , Toast.LENGTH_LONG).show();
                     if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                         selected_icon = GetRandomChoice(ImageFolders);
                     indexingDB.InsertNewFolder(fn , selected_icon);
                     int id = indexingDB.GetLastRecordId()+1;
                     filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
+                    TastyToast.makeText(context, "Created successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
                     // To add the new item to the list to make it show
                     fileRecAdapter.notifyItemInserted(fp);
                 }
@@ -151,7 +152,6 @@ public class helpers {
                 if (!folder_name.getText().toString().isEmpty()){
                     String fn = folder_name.getText().toString();
                     Integer fp = filesRec.size();
-                    Toast.makeText(context , fn , Toast.LENGTH_LONG).show();
                     if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                         selected_icon = GetRandomChoice(ImageFolders);
                     int pos = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
@@ -159,6 +159,7 @@ public class helpers {
                     indexingDB.UpdateFolder(fn , Integer.toString(selected_icon) , Integer.toString(id));
                     filesRec.set(pos , new FilesRec(selected_icon , fn , id));
                     fileRecAdapter.notifyItemChanged(pos);
+                    TastyToast.makeText(context, "The edit has saved !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
                     MoveTo(context , "Edit" , fileRecAdapter.ch.get(0).toString());
                 }
                 ad.dismiss();
@@ -184,6 +185,12 @@ public class helpers {
     public static int GetRandomChoice(int[] array){
         int rnd = new Random().nextInt(array.length);
         return array[rnd];
+    }
+
+    public AlertDialog.Builder AlertMessage(Activity context , String message , String title , int icon){
+        AlertDialog.Builder al = new AlertDialog.Builder(context);
+        al.setMessage(message).setIcon(icon).setTitle(title);
+        return al;
     }
 
 

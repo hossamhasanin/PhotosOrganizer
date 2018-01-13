@@ -23,6 +23,7 @@ import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragme
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FragmentsListener;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
 import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 import java.util.jar.Manifest;
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.bar_create_folder:
-                        Toast.makeText(getApplicationContext() , "Create folder" , Toast.LENGTH_SHORT).show();
                         new helpers().CreateNewFolder(context , FileRecAdapter.filesRec , FileRecAdapter.getInstance() , true , bottomNavigationView);
                         break;
                     case R.id.take_photo :
@@ -71,13 +71,13 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
                                     MoveToShowImagesActivity();
                                 }
                             } else {
-                                Toast.makeText(getApplicationContext() , "There is no folders , create one to put image" , Toast.LENGTH_LONG).show();
+                                TastyToast.makeText(getApplicationContext(), "There is no folders create one first !", TastyToast.LENGTH_SHORT, TastyToast.INFO);
                             }
                         } else {
                             if (folders.size() != 0) {
                                 MoveToShowImagesActivity();
                             } else {
-                                Toast.makeText(getApplicationContext() , "There is no folders , create one to put image" , Toast.LENGTH_LONG).show();
+                                TastyToast.makeText(getApplicationContext(), "There is no folders create one first !", TastyToast.LENGTH_SHORT, TastyToast.INFO);
                             }
                         }
 
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
     }
 
     public void MoveToShowImagesActivity(){
-        Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(intent , GET_IMAGE_CODE);
     }
@@ -106,13 +106,13 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     bottomNavigationView.setSelectedItemId(R.id.main_bar_item);
                 } else {
-                    Toast.makeText(getApplicationContext() , "Permission denied!" , Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(), "Permission denied !", TastyToast.LENGTH_SHORT, TastyToast.ERROR);
                 }
             case REQUEST_STORAGE_PERM_FROM_RECYC:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
                 } else {
-                    Toast.makeText(getApplicationContext() , "Permission denied!" , Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(), "Permission denied !", TastyToast.LENGTH_SHORT, TastyToast.ERROR);
                 }
         }
     }
@@ -129,9 +129,10 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
             startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
         } else if (requestCode == SAVE_IMAGE_IN_DATATBASE_CODE){
             if (data.getExtras().getInt("success") == 1)
-                Toast.makeText(getApplicationContext() , "Saved the image successfully!" , Toast.LENGTH_SHORT).show();
+                TastyToast.makeText(getApplicationContext(), "Saved successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
             else
-                Toast.makeText(getApplicationContext() , "Didn't save the image!" , Toast.LENGTH_SHORT).show();
+                TastyToast.makeText(getApplicationContext(), "You escaped !", TastyToast.LENGTH_SHORT , TastyToast.CONFUSING);
+
             bottomNavigationView.setSelectedItemId(R.id.main_bar_item);
         }
 

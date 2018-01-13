@@ -1,9 +1,11 @@
 package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +22,8 @@ import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 
@@ -49,7 +53,7 @@ public class DeleteFoldersFragment extends Fragment {
         //getActivity().getActionBar().setTitle("Delete");
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(android.R.drawable.ic_delete);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,9 +97,43 @@ public class DeleteFoldersFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int item_id = item.getItemId();
-        switch (item_id) {
-            case R.id.delete_folder_dmenu:
-                fileRecAdapter.DeleteFolder();
+        if (item_id == R.id.delete_folder_dmenu) {
+                int folders_are_full = 0;
+                for (int i=0;i<fileRecAdapter.ch.size();i++){
+                    int p = Integer.parseInt(fileRecAdapter.ch.get(i).toString());
+                    ArrayList<ImagesRecModel> folder_is_empty = indexingDB.GetAllImages(Integer.toString(filesRec.get(p).id));
+                    if (folder_is_empty.size() > 0){
+                        folders_are_full = 1;
+                        break;
+                    }
+                }
+                if (folders_are_full == 1){
+                    AlertDialog.Builder al = new helpers().AlertMessage(getActivity() , "Are you sure you want to delete ? there is folder contains images" , "Delete folders" , R.drawable.ic_delete_basket_black);
+                    al.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            fileRecAdapter.DeleteFolder();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            TastyToast.makeText(getActivity(), "Don't play with me i am confused !", TastyToast.LENGTH_LONG, TastyToast.CONFUSING);
+                        }
+                    }).show();
+                } else {
+                    AlertDialog.Builder al = new helpers().AlertMessage(getActivity() , "Are you sure you want to delete ?" , "Delete folders" , R.drawable.ic_delete_basket_black);
+                    al.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            fileRecAdapter.DeleteFolder();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            TastyToast.makeText(getActivity(), "Don't play with me i am confused !", TastyToast.LENGTH_LONG, TastyToast.CONFUSING);
+                        }
+                    }).show();
+                }
         }
 
         return super.onOptionsItemSelected(item);
