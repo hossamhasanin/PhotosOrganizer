@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
@@ -39,7 +37,7 @@ public class EditFoldersFragment extends Fragment {
     public RecyclerView show_files;
     ArrayList<FilesRec> filesRec;
     GridLayoutManager gridLayoutManager;
-    FragmentsListener fragmentsListener;
+    FoldersFragmentsListener foldersFragmentsListener;
     ArrayList future_positions;
     IndexingDB indexingDB;
     ArrayList<FoldersModel> all_folders;
@@ -73,7 +71,7 @@ public class EditFoldersFragment extends Fragment {
         for (Integer i=0;i<all_folders.size();i++){
             filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id));
         }
-        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Edit" , fragmentsListener);
+        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Edit" , foldersFragmentsListener);
         show_files.setAdapter(fileRecAdapter);
         if(getActivity().getApplicationContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridLayoutManager = new GridLayoutManager(getActivity() , 4);
@@ -136,7 +134,7 @@ public class EditFoldersFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            fragmentsListener = (FragmentsListener) context;
+            foldersFragmentsListener = (FoldersFragmentsListener) context;
         }catch (Exception e){}
     }
 }

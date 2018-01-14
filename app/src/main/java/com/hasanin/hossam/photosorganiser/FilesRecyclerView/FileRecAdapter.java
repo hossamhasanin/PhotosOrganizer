@@ -23,8 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hasanin.hossam.photosorganiser.MainActivity;
-import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FragmentsListener;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsListener;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
@@ -45,21 +44,21 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
     // this var to take the position of the checkbox that should be checked in the DeleteFolderActivity
     public static ArrayList future_positions;
     public static String frag;
-    public static FragmentsListener fragmentsListener;
+    public static FoldersFragmentsListener foldersFragmentsListener;
 
-    public FileRecAdapter(ArrayList filesRec , Activity context , ArrayList future_positions , String frag , FragmentsListener fragmentsListener){
+    public FileRecAdapter(ArrayList filesRec , Activity context , ArrayList future_positions , String frag , FoldersFragmentsListener foldersFragmentsListener){
         this.filesRec = filesRec;
         this.context = context;
         this.future_positions = future_positions;
         this.frag = frag;
-        this.fragmentsListener = fragmentsListener;
+        this.foldersFragmentsListener = foldersFragmentsListener;
     }
 
     public static FileRecAdapter fileRecAdapter;
 
     public static synchronized FileRecAdapter getInstance(){
         if (fileRecAdapter == null)
-            fileRecAdapter = new FileRecAdapter(filesRec , context , future_positions , frag , fragmentsListener);
+            fileRecAdapter = new FileRecAdapter(filesRec , context , future_positions , frag , foldersFragmentsListener);
         return fileRecAdapter;
     }
 
@@ -122,7 +121,7 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                         if (isChecked == true){
                             ch.add(Integer.toString(position));
                             if (frag == "Edit" && ch.size() == 2){
-                                fragmentsListener.OnMoveToListener(1 , ch);
+                                foldersFragmentsListener.OnMoveToListener(1 , ch);
                             }
                         } else if (isChecked == false) {
                             ch.remove(Integer.toString(position));
@@ -151,7 +150,8 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                 holder.folder_card.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        fragmentsListener.OnPositionListener(position-1);
+                        // i sent the position-1 because there is a place had been taken for (create new folder)
+                        foldersFragmentsListener.OnPositionListener(position-1);
                         return false;
                     }
                 });

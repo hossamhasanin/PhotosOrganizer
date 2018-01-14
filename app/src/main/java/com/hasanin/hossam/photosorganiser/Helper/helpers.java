@@ -85,7 +85,7 @@ public class helpers {
                     if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                         selected_icon = GetRandomChoice(ImageFolders);
                     indexingDB.InsertNewFolder(fn , selected_icon);
-                    int id = indexingDB.GetLastRecordId()+1;
+                    int id = indexingDB.GetLastRecordId();
                     filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
                     TastyToast.makeText(context, "Created successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
                     // To add the new item to the list to make it show

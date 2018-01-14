@@ -20,15 +20,13 @@ import com.hasanin.hossam.photosorganiser.Helper.BottomNavigationViewHelper;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.DeleteFoldersFragment;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragment;
-import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FragmentsListener;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsListener;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
-import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
-import java.util.jar.Manifest;
 
-public class MainActivity extends AppCompatActivity implements FragmentsListener {
+public class MainActivity extends AppCompatActivity implements FoldersFragmentsListener {
 
     int GET_IMAGE_CODE = 100;
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
@@ -37,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
 
     BottomNavigationView bottomNavigationView;
     ArrayList<FoldersModel> folders;
+    IndexingDB indexingDB;
+    //ShowFoldersFragment showFoldersFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
         setSupportActionBar(toolbar);
         getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
 
-        IndexingDB indexingDB = new IndexingDB(this);
-        folders = indexingDB.GetAllFolders();
+        indexingDB = new IndexingDB(this);
 
         final Activity context = this;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottombar);
@@ -63,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsListener
                         Toast.makeText(getApplicationContext() , "take photo" , Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.import_image:
+                        folders = indexingDB.GetAllFolders();
                         if((int) Build.VERSION.SDK_INT >= 23){
                             if (folders.size() != 0) {
                                 if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

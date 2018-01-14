@@ -36,7 +36,7 @@ public class DeleteFoldersFragment extends Fragment {
     public RecyclerView show_files;
     ArrayList<FilesRec> filesRec;
     GridLayoutManager gridLayoutManager;
-    FragmentsListener fragmentsListener;
+    FoldersFragmentsListener foldersFragmentsListener;
     ArrayList future_positions;
     FileRecAdapter fileRecAdapter;
     IndexingDB indexingDB;
@@ -72,7 +72,7 @@ public class DeleteFoldersFragment extends Fragment {
         for (Integer i=0;i<all_folders.size();i++){
             filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id));
         }
-        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Delete" , fragmentsListener );
+        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Delete" , foldersFragmentsListener);
         show_files.setAdapter(fileRecAdapter);
         if(getActivity().getApplicationContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridLayoutManager = new GridLayoutManager(getActivity() , 4);

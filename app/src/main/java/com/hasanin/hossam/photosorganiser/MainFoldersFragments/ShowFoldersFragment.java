@@ -2,11 +2,8 @@ package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,7 +23,6 @@ import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
-import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
 
 import java.util.ArrayList;
 
@@ -37,11 +33,11 @@ import java.util.ArrayList;
 public class ShowFoldersFragment extends Fragment {
 
     public RecyclerView show_files;
-    ArrayList<FilesRec> filesRec;
+    public ArrayList<FilesRec> filesRec;
     GridLayoutManager gridLayoutManager;
-    FragmentsListener fragmentsListener;
+    FoldersFragmentsListener foldersFragmentsListener;
     IndexingDB indexingDB;
-    FileRecAdapter fileRecAdapter;
+    public FileRecAdapter fileRecAdapter;
 
     @Nullable
     @Override
@@ -61,7 +57,7 @@ public class ShowFoldersFragment extends Fragment {
         }
         ArrayList positions = new ArrayList();
         positions.add(Integer.toString(0));
-        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , positions , "Main" , fragmentsListener);
+        fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , positions , "Main" , foldersFragmentsListener);
         show_files.setAdapter(fileRecAdapter);
         if(getActivity().getApplicationContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridLayoutManager = new GridLayoutManager(getActivity() , 4);
@@ -93,23 +89,10 @@ public class ShowFoldersFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case 300:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-                } else {
-
-                }
-        }
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            fragmentsListener = (FragmentsListener) context;
+            foldersFragmentsListener = (FoldersFragmentsListener) context;
         }catch (Exception e){}
     }
 }
