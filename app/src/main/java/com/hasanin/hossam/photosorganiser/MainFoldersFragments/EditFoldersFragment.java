@@ -79,6 +79,7 @@ public class EditFoldersFragment extends Fragment {
             gridLayoutManager = new GridLayoutManager(getActivity() , 5);
         }
         show_files.setLayoutManager(gridLayoutManager);
+        //gridLayoutManager.scrollToPosition(Integer.parseInt(future_positions.get(0).toString()));
         return view;
     }
 

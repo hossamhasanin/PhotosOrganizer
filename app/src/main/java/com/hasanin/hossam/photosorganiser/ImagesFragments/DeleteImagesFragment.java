@@ -57,7 +57,9 @@ public class DeleteImagesFragment extends Fragment {
         all_images = indexingDB.GetAllImages(Integer.toString(folder_id));
         imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Delete" , future_pos);
         show_images.setAdapter(imageRecAdapter);
-        show_images.setLayoutManager(new GridLayoutManager(getActivity() , 1));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity() , 1);
+        show_images.setLayoutManager(gridLayoutManager);
+        gridLayoutManager.scrollToPosition(future_pos);
         return view;
     }
 

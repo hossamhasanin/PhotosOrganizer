@@ -1,6 +1,7 @@
 package com.hasanin.hossam.photosorganiser.ShowImages;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import com.hasanin.hossam.photosorganiser.ImagesFragments.DeleteImagesFragment;
 import com.hasanin.hossam.photosorganiser.ImagesFragments.ShowImagesFragment;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.MainActivity;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsListener;
 import com.hasanin.hossam.photosorganiser.R;
 
@@ -25,6 +27,8 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
     ShowImagesFragment showImagesFragment;
     int folder_id;
     String folder_title;
+    String frag;
+    int previous_pos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +42,9 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(folder_title);
 
+        frag = "Main";
         showImagesFragment = new ShowImagesFragment();
-        showImagesFragment.setData(data.getString("folder_name") , folder_id);
+        showImagesFragment.setData(data.getString("folder_name") , folder_id , 0);
         getFragmentManager().beginTransaction().add(R.id.images_container , showImagesFragment).commit();
 
 
@@ -48,12 +53,16 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
     @Override
     public void MoveToFragment(String frag , int future_pos) {
         if (frag == "Delete"){
+            this.frag = "Delete";
             DeleteImagesFragment deleteImagesFragment = new DeleteImagesFragment();
+            this.previous_pos = future_pos;
             deleteImagesFragment.setData(future_pos , folder_id);
             getFragmentManager().beginTransaction().replace(R.id.images_container , deleteImagesFragment).addToBackStack(null).commit();
         } else if (frag == "Main") {
+            this.frag = "Main";
             ShowImagesFragment showImagesFragment = new ShowImagesFragment();
-            showImagesFragment.setData(folder_title , folder_id);
+            int previous_pos = future_pos;
+            showImagesFragment.setData(folder_title , folder_id , previous_pos);
             getFragmentManager().beginTransaction().replace(R.id.images_container , showImagesFragment).addToBackStack(null).commit();
         }
     }
@@ -61,10 +70,13 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() != 0) {
-            getFragmentManager().popBackStack();
-        } else {
-            super.onBackPressed();
+        if (frag == "Main"){
+            Intent intent = new Intent(this , MainActivity.class);
+            startActivity(intent);
+        } else if (frag == "Delete") {
+            ShowImagesFragment showImagesFragment = new ShowImagesFragment();
+            showImagesFragment.setData(folder_title , folder_id , this.previous_pos);
+            getFragmentManager().beginTransaction().replace(R.id.images_container , showImagesFragment).addToBackStack(null).commit();
         }
     }
 }

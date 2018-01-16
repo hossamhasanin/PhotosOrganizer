@@ -2,6 +2,7 @@ package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -80,6 +81,7 @@ public class DeleteFoldersFragment extends Fragment {
             gridLayoutManager = new GridLayoutManager(getActivity() , 5);
         }
         show_files.setLayoutManager(gridLayoutManager);
+        //gridLayoutManager.scrollToPosition(Integer.parseInt(future_positions.get(0).toString()));
         return view;
     }
 

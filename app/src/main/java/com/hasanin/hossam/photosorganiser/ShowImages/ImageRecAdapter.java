@@ -83,7 +83,7 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                         Toast.makeText(context , "paf "+ position , Toast.LENGTH_SHORT).show();
                         holder.stored_image_card.setCardBackgroundColor(ContextCompat.getColor(context,R.color.checked));
                         if (checked.size() == 0){
-                            imagesFragmentsListener.MoveToFragment("Main" , 0);
+                            imagesFragmentsListener.MoveToFragment("Main" , position);
                         }
                     }
                 }

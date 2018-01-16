@@ -33,11 +33,13 @@ public class ShowImagesFragment extends Fragment {
     Activity context;
     String folder_title;
     int folder_id;
+    int previous_pos;
     ImagesFragmentsListener imagesFragmentsListener;
 
-    public void setData(String folder_title , int folder_id){
+    public void setData(String folder_title , int folder_id , int previous_pos){
         this.folder_title = folder_title;
         this.folder_id = folder_id;
+        this.previous_pos = previous_pos;
     }
 
     @Nullable
@@ -53,7 +55,9 @@ public class ShowImagesFragment extends Fragment {
         all_images = indexingDB.GetAllImages(Integer.toString(folder_id));
         imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Main" , -1);
         show_images.setAdapter(imageRecAdapter);
-        show_images.setLayoutManager(new GridLayoutManager(getActivity() , 1));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity() , 1);
+        show_images.setLayoutManager(gridLayoutManager);
+        gridLayoutManager.scrollToPosition(previous_pos);
 
         return view;
     }
