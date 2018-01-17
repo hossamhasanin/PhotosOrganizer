@@ -7,9 +7,9 @@ import android.net.Uri;
  */
 
 public class ImagesRecModel {
-    Uri image;
-    String image_name;
-    int id;
+    public Uri image;
+    public String image_name;
+    public int id;
     public ImagesRecModel(Uri image , String image_name , int id){
         this.image = image;
         this.image_name = image_name;

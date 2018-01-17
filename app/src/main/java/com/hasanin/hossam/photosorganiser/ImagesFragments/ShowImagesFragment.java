@@ -3,6 +3,7 @@ package com.hasanin.hossam.photosorganiser.ImagesFragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.MainActivity;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsListener;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImageRecAdapter;
@@ -49,6 +51,12 @@ public class ShowImagesFragment extends Fragment {
         this.setHasOptionsMenu(true);
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
 
         show_images = (RecyclerView) view.findViewById(R.id.show_images);
         indexingDB = new IndexingDB(getActivity());

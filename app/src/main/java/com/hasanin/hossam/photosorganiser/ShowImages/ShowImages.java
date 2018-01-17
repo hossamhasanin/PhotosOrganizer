@@ -24,11 +24,13 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
     ImageRecAdapter imageRecAdapter;
     Activity context = this;
     private static final int REQUEST_STORAGE_PERM = 300;
-    ShowImagesFragment showImagesFragment;
+    ShowImagesFragment showImagesFragment = new ShowImagesFragment();
+    DeleteImagesFragment deleteImagesFragment = new DeleteImagesFragment();
     int folder_id;
     String folder_title;
-    String frag;
+    public String frag = "Main";
     int previous_pos;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +56,13 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
     public void MoveToFragment(String frag , int future_pos) {
         if (frag == "Delete"){
             this.frag = "Delete";
-            DeleteImagesFragment deleteImagesFragment = new DeleteImagesFragment();
+            deleteImagesFragment = new DeleteImagesFragment();
             this.previous_pos = future_pos;
             deleteImagesFragment.setData(future_pos , folder_id);
             getFragmentManager().beginTransaction().replace(R.id.images_container , deleteImagesFragment).addToBackStack(null).commit();
         } else if (frag == "Main") {
             this.frag = "Main";
-            ShowImagesFragment showImagesFragment = new ShowImagesFragment();
+            showImagesFragment = new ShowImagesFragment();
             int previous_pos = future_pos;
             showImagesFragment.setData(folder_title , folder_id , previous_pos);
             getFragmentManager().beginTransaction().replace(R.id.images_container , showImagesFragment).addToBackStack(null).commit();
@@ -70,13 +72,15 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
 
     @Override
     public void onBackPressed() {
-        if (frag == "Main"){
+        if (showImagesFragment.isAdded()){
             Intent intent = new Intent(this , MainActivity.class);
             startActivity(intent);
-        } else if (frag == "Delete") {
-            ShowImagesFragment showImagesFragment = new ShowImagesFragment();
+        } else if (deleteImagesFragment.isAdded()) {
+            showImagesFragment = new ShowImagesFragment();
             showImagesFragment.setData(folder_title , folder_id , this.previous_pos);
             getFragmentManager().beginTransaction().replace(R.id.images_container , showImagesFragment).addToBackStack(null).commit();
+        } else {
+            super.onBackPressed();
         }
     }
 }

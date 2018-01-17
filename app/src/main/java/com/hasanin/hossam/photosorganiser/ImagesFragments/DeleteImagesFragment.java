@@ -3,6 +3,7 @@ package com.hasanin.hossam.photosorganiser.ImagesFragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,10 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.MainActivity;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImageRecAdapter;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesFragmentsListener;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 
@@ -51,6 +54,12 @@ public class DeleteImagesFragment extends Fragment {
         this.setHasOptionsMenu(true);
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
 
         show_images = (RecyclerView) view.findViewById(R.id.show_images);
         indexingDB = new IndexingDB(getActivity());
@@ -73,7 +82,25 @@ public class DeleteImagesFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int item_id = item.getItemId();
         if (item_id == R.id.delete_image_dmenu){
+            ArrayList checked_images = imageRecAdapter.checked;
+            for (int i=0;i<checked_images.size();i++){
+                int p = Integer.parseInt(checked_images.get(i).toString());
+                int id = all_images.get(p).id;
+                indexingDB.DeleteImage(Integer.toString(id));
+            }
 
+            if (checked_images.size() > 1)
+                TastyToast.makeText(getActivity() , "The images is deleted successfully !" , TastyToast.LENGTH_LONG , TastyToast.SUCCESS);
+            else
+                TastyToast.makeText(getActivity() , "The image is deleted successfully !" , TastyToast.LENGTH_LONG , TastyToast.SUCCESS);
+
+            if (checked_images.size() == all_images.size()) {
+                startActivity(new Intent(getActivity() , MainActivity.class));
+            }else{
+                ShowImagesFragment showImagesFragment = new ShowImagesFragment();
+                showImagesFragment.setData(folder_title, folder_id, future_pos);
+                getActivity().getFragmentManager().beginTransaction().replace(R.id.images_container, showImagesFragment).commit();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

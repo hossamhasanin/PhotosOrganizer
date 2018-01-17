@@ -79,19 +79,23 @@ public class helpers {
         create_folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!folder_name.getText().toString().isEmpty()){
-                    String fn = folder_name.getText().toString();
-                    Integer fp = filesRec.size();
-                    if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
-                        selected_icon = GetRandomChoice(ImageFolders);
-                    indexingDB.InsertNewFolder(fn , selected_icon);
-                    int id = indexingDB.GetLastRecordId();
-                    filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
-                    TastyToast.makeText(context, "Created successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
-                    // To add the new item to the list to make it show
-                    fileRecAdapter.notifyItemInserted(fp);
+
+                if (!CreateFolderInstructions(context)){
+                    return;
                 }
+
+                String fn = folder_name.getText().toString();
+                Integer fp = filesRec.size();
+                if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
+                    selected_icon = GetRandomChoice(ImageFolders);
+                indexingDB.InsertNewFolder(fn , selected_icon);
+                int id = indexingDB.GetLastRecordId();
+                filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
+                TastyToast.makeText(context, "Created successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
+                // To add the new item to the list to make it show
+                fileRecAdapter.notifyItemInserted(fp);
                 ad.dismiss();
+
                 if (bottombar) {
                     bottomNavigationView.setSelectedItemId(R.id.main_bar_item);
                 }
@@ -180,6 +184,26 @@ public class helpers {
             context.getFragmentManager().beginTransaction().replace(R.id.lists_container , editFoldersFragment).addToBackStack(null).commit();
 
         }
+    }
+
+    public boolean CreateFolderInstructions(Activity context){
+        if (folder_name.getText().toString().isEmpty()){
+            TastyToast.makeText(context , "Write name to the folder !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        if (indexingDB.FolderNameExist(folder_name.getText().toString())){
+            TastyToast.makeText(context , "This name is exist !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        if (folder_name.getText().toString().length() > 20){
+            TastyToast.makeText(context , "The name is too long !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        if (folder_name.getText().toString().length() < 3){
+            TastyToast.makeText(context , "The name is too short !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        return true;
     }
 
     public static int GetRandomChoice(int[] array){

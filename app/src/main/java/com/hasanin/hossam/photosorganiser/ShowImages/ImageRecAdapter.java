@@ -1,7 +1,9 @@
 package com.hasanin.hossam.photosorganiser.ShowImages;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -33,7 +35,7 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
     String frag;
     ImagesFragmentsListener imagesFragmentsListener;
     int future_pos;
-    ArrayList<String> checked = new ArrayList<String>();;
+    public ArrayList<String> checked = new ArrayList<String>();;
 
     public ImageRecAdapter(ArrayList<ImagesRecModel> ImageRec , Activity context , ImagesFragmentsListener imagesFragmentsListener , String frag , int future_pos){
         this.context = context;
@@ -58,6 +60,12 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                 public boolean onLongClick(View v) {
                     imagesFragmentsListener.MoveToFragment("Delete" , position);
                     return false;
+                }
+            });
+            holder.stored_image_card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, imageRec.get(position).image));
                 }
             });
         } else if (frag == "Delete"){

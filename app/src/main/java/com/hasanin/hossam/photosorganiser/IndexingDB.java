@@ -103,6 +103,17 @@ public class IndexingDB extends SQLiteOpenHelper {
         }
     }
 
+    public boolean FolderNameExist(String folder_name){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE name = '"+folder_name+"'" , null);
+        data.moveToFirst();
+        if (data.getInt(0) == 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public int GetLastRecordId(){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor data = db.rawQuery("SELECT * FROM container order by id desc limit 1", null);
@@ -130,6 +141,15 @@ public class IndexingDB extends SQLiteOpenHelper {
         try {
             DeleteImagesByItsPlace(Integer.toString(id));
             db.execSQL("DELETE FROM container WHERE name = " + "'" +name+ "'");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public void DeleteImage(String id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.execSQL("DELETE FROM container WHERE type = 1 AND id = "+id);
         }catch (Exception e){
             System.out.println(e);
         }
