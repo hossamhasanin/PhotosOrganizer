@@ -112,4 +112,15 @@ public class ImportImage extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this , MainActivity.class);
+        Bundle b = new Bundle();
+        b.putInt("success" , 0);
+        intent.putExtras(b);
+        setResult(SAVE_IMAGE_IN_DATATBASE_CODE , intent);
+        finish();
+        super.onBackPressed();
+    }
 }

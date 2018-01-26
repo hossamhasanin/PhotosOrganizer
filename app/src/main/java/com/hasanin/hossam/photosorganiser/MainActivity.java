@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
         ArrayList positions = new ArrayList();
         positions.add(Integer.toString(position));
         editFoldersFragment.setFuturePositions(positions);
-        getFragmentManager().beginTransaction().replace(R.id.lists_container , editFoldersFragment).addToBackStack(null).commit();
+        getFragmentManager().beginTransaction().setCustomAnimations(R.animator.fragments_fade_in , R.animator.fragments_fade_out).replace(R.id.lists_container , editFoldersFragment).addToBackStack(null).commit();
     }
 
     @Override

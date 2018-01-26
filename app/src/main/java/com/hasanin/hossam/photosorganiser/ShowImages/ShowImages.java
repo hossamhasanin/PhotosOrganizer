@@ -75,6 +75,7 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
         if (showImagesFragment.isAdded()){
             Intent intent = new Intent(this , MainActivity.class);
             startActivity(intent);
+            finish();
         } else if (deleteImagesFragment.isAdded()) {
             showImagesFragment = new ShowImagesFragment();
             showImagesFragment.setData(folder_title , folder_id , this.previous_pos);

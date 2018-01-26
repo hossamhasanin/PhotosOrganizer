@@ -19,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -179,6 +180,7 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                                     bundle.putString("folder_name", filesRec.get(position).file_name);
                                     intent.putExtras(bundle);
                                     context.startActivity(intent);
+                                    context.finish();
                                 } else {
                                     Toast.makeText(context , "There is no images inside!" , Toast.LENGTH_LONG).show();
                                 }
@@ -218,11 +220,11 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public ImageView file_im;
         public TextView file_name;
-        public RelativeLayout folder_card;
+        public LinearLayout folder_card;
         public CheckBox delete_folder;
         public ViewHolder(View itemView) {
             super(itemView);
-            folder_card = (RelativeLayout) itemView.findViewById(R.id.folder_card);
+            folder_card = (LinearLayout) itemView.findViewById(R.id.folder_card);
             delete_folder = (CheckBox) itemView.findViewById(R.id.delete_folder);
             file_im = (ImageView) itemView.findViewById(R.id.files);
             file_name = (TextView) itemView.findViewById(R.id.file_name);
