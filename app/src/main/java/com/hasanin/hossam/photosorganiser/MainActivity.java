@@ -45,8 +45,14 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
-
         indexingDB = new IndexingDB(this);
+
+        try {
+            if (!getIntent().getStringExtra("show_no_folders_error").isEmpty()){
+                TastyToast.makeText(getApplicationContext() , "There is no folders!" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            }
+        }catch (NullPointerException e){}
+
 
         final Activity context = this;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottombar);

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 
@@ -32,6 +33,7 @@ public class ImportImage extends AppCompatActivity {
     int selected_folder;
     Activity context;
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
+    Uri image_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,19 @@ public class ImportImage extends AppCompatActivity {
         indexingDB = new IndexingDB(this);
         context = this;
 
-        final Uri image_uri = Uri.parse(getIntent().getExtras().getString("image"));
+        String action = getIntent().getAction();
+        String type = getIntent().getType();
+        if (Intent.ACTION_SEND.equals(action) && type.startsWith("image/")){
+            image_uri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+            if (indexingDB.GetAllFolders().size() == 0){
+                Intent intent = new Intent(context , MainActivity.class);
+                intent.putExtra("show_no_folders_error" , "error");
+                startActivity(intent);
+            }
+        } else if(!getIntent().getExtras().getString("image").isEmpty()) {
+            image_uri = Uri.parse(getIntent().getExtras().getString("image"));
+        }
+
 
         btn_import = (FloatingActionButton) findViewById(R.id.btn_import);
         btn_close = (FloatingActionButton) findViewById(R.id.import_btn_close);
@@ -82,12 +96,7 @@ public class ImportImage extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 indexingDB.InsertNewImage(image_name.getText().toString() , image_uri , selected_folder);
-                Intent intent = new Intent(context , MainActivity.class);
-                Bundle b = new Bundle();
-                b.putInt("success" , 1);
-                intent.putExtras(b);
-                setResult(SAVE_IMAGE_IN_DATATBASE_CODE , intent);
-                finish();
+                finishMoveBack(1);
             }
         });
 
@@ -102,15 +111,19 @@ public class ImportImage extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Intent intent = new Intent(context , MainActivity.class);
-                Bundle b = new Bundle();
-                b.putInt("success" , 0);
-                intent.putExtras(b);
-                setResult(SAVE_IMAGE_IN_DATATBASE_CODE , intent);
-                finish();
+                finishMoveBack(0);
             }
         });
 
+    }
+
+    public void finishMoveBack(int success){
+        Intent intent = new Intent(context , MainActivity.class);
+        Bundle b = new Bundle();
+        b.putInt("success" , success);
+        intent.putExtras(b);
+        setResult(SAVE_IMAGE_IN_DATATBASE_CODE , intent);
+        finish();
     }
 
     @Override
