@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.MainActivity;
@@ -41,6 +44,10 @@ public class DeleteImagesFragment extends Fragment {
     int folder_id;
     ImagesFragmentsListener imagesFragmentsListener;
     int future_pos;
+    FloatingActionButton fabAddFab;
+    FloatingActionButton fabImportImg;
+    FloatingActionButton fabTakeImg;
+    boolean isFabOben = false;
 
     public void setData(int future_pos , int folder_id){
         this.future_pos = future_pos;
@@ -69,6 +76,37 @@ public class DeleteImagesFragment extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity() , 1);
         show_images.setLayoutManager(gridLayoutManager);
         gridLayoutManager.scrollToPosition(future_pos);
+
+        fabAddFab = (FloatingActionButton) view.findViewById(R.id.fab_add_fab);
+        fabTakeImg = (FloatingActionButton) view.findViewById(R.id.fab_take_image);
+        fabImportImg = (FloatingActionButton) view.findViewById(R.id.fab_import_image);
+
+        final Animation fabGetIn = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_get_in);
+        final Animation fabGetOut = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_get_out);
+        final Animation fabRotateIn = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_rotate_in);
+        final Animation fabRotateOut = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_rotate_out);
+
+        fabAddFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFabOben){
+                    fabAddFab.setAnimation(fabRotateOut);
+                    fabImportImg.setAnimation(fabGetOut);
+                    fabTakeImg.setAnimation(fabGetOut);
+                    fabImportImg.setClickable(false);
+                    fabTakeImg.setClickable(false);
+                    isFabOben = false;
+                } else {
+                    fabAddFab.setAnimation(fabRotateIn);
+                    fabImportImg.setAnimation(fabGetIn);
+                    fabTakeImg.setAnimation(fabGetIn);
+                    fabImportImg.setClickable(true);
+                    fabTakeImg.setClickable(true);
+                    isFabOben = true;
+                }
+            }
+        });
+
         return view;
     }
 
