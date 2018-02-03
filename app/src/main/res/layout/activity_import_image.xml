@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:id="@+id/activity_import_img"
     tools:context="com.hasanin.hossam.photosorganiser.ImportImage">
 
 
@@ -76,7 +77,7 @@
             android:layout_margin="5dp"/>
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/titleOfStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chose folder :"
@@ -91,5 +92,27 @@
             android:layout_height="55dp"
             android:background="@color/bright_gray"
             android:layout_margin="10dp"/>
+        <LinearLayout
+            android:id="@+id/existed_folder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/existed_folderIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/if_thepirate" />
+            <TextView
+                android:id="@+id/existed_folderTile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Folder 1"
+                android:textSize="16sp"
+                android:layout_marginTop="14dp"
+                android:layout_marginLeft="10dp"
+                android:textColor="@android:color/black"/>
+
+        </LinearLayout>
 
 </LinearLayout>

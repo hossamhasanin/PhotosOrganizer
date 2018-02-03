@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.ImportImage;
@@ -32,6 +34,10 @@ import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
+
+import me.toptas.fancyshowcase.DismissListener;
+import me.toptas.fancyshowcase.FancyShowCaseView;
+import me.toptas.fancyshowcase.OnViewInflateListener;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -57,6 +63,7 @@ public class ShowImagesFragment extends Fragment {
     ArrayList<FoldersModel> folders;
     private static final int REQUEST_STORAGE_PERM = 300;
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
+    FancyShowCaseView mFancyShowCaseView;
 
     public void setData(String folder_title , int folder_id , int previous_pos){
         this.folder_title = folder_title;
@@ -88,60 +95,64 @@ public class ShowImagesFragment extends Fragment {
         gridLayoutManager.scrollToPosition(previous_pos);
 
         fabAddFab = (FloatingActionButton) view.findViewById(R.id.fab_add_fab);
-        fabTakeImg = (FloatingActionButton) view.findViewById(R.id.fab_take_image);
-        fabImportImg = (FloatingActionButton) view.findViewById(R.id.fab_import_image);
 
         fabAddFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Animation fabGetIn = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_get_in);
-                Animation fabGetOut = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_get_out);
-                Animation fabRotateIn = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_rotate_in);
-                Animation fabRotateOut = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_rotate_out);
-                if (isFabOben){
-                    fabAddFab.setAnimation(fabRotateOut);
-                    fabImportImg.setAnimation(fabGetOut);
-                    fabTakeImg.setAnimation(fabGetOut);
-                    fabImportImg.setVisibility(View.GONE);
-                    fabTakeImg.setVisibility(View.GONE);
-                    isFabOben = false;
-                } else {
-                    fabAddFab.setAnimation(fabRotateIn);
-                    fabImportImg.setAnimation(fabGetIn);
-                    fabTakeImg.setAnimation(fabGetIn);
-                    fabImportImg.setVisibility(View.VISIBLE);
-                    fabTakeImg.setVisibility(View.VISIBLE);
-                    isFabOben = true;
-                }
+                mFancyShowCaseView = new FancyShowCaseView.Builder(getActivity())
+                        .focusOn(v)
+                        .customView(R.layout.custom_overlab_fabs, onViewInflateListener)
+                        .disableFocusAnimation()
+                        .closeOnTouch(true)
+                        .build();
+                mFancyShowCaseView.show();
             }
         });
 
-        fabImportImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                folders = indexingDB.GetAllFolders();
-                if((int) Build.VERSION.SDK_INT >= 23){
-                    if (folders.size() != 0) {
+        return view;
+    }
+
+    OnViewInflateListener onViewInflateListener = new OnViewInflateListener() {
+        @Override
+        public void onViewInflated(View view) {
+            FloatingActionButton importImage = (FloatingActionButton) view.findViewById(R.id.cfab_import_image);
+            FloatingActionButton takeImage = (FloatingActionButton) view.findViewById(R.id.cfab_take_image);
+            final FloatingActionButton close = (FloatingActionButton) view.findViewById(R.id.cfab_add_fab);
+            Animation fabRotateIn = AnimationUtils.loadAnimation(getActivity() , R.anim.fab_rotate_in);
+            close.setAnimation(fabRotateIn);
+            close.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mFancyShowCaseView.hide();
+                }
+            });
+
+            importImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    folders = indexingDB.GetAllFolders();
+                    if((int) Build.VERSION.SDK_INT >= 23){
                         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERM);
                         } else {
                             MoveToShowImagesActivity();
                         }
                     } else {
-                        TastyToast.makeText(getActivity(), "There is no folders create one first !", TastyToast.LENGTH_SHORT, TastyToast.INFO);
-                    }
-                } else {
-                    if (folders.size() != 0) {
                         MoveToShowImagesActivity();
-                    } else {
-                        TastyToast.makeText(getActivity(), "There is no folders create one first !", TastyToast.LENGTH_SHORT, TastyToast.INFO);
                     }
+                    mFancyShowCaseView.hide();
                 }
-            }
-        });
+            });
 
-        return view;
-    }
+            takeImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TastyToast.makeText(getActivity() , "Take image" , TastyToast.LENGTH_SHORT , TastyToast.INFO);
+                }
+            });
+
+        }
+    };
 
     public void MoveToShowImagesActivity(){
         //Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
@@ -156,6 +167,8 @@ public class ShowImagesFragment extends Fragment {
             Intent intent = new Intent(getActivity() , ImportImage.class);
             Bundle b = new Bundle();
             b.putString("image" , String.valueOf(data.getData()));
+            b.putInt("folder_id" , folder_id);
+            b.putString("folder_title" , folder_title);
             intent.putExtras(b);
             startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
         } else if (requestCode == SAVE_IMAGE_IN_DATATBASE_CODE){

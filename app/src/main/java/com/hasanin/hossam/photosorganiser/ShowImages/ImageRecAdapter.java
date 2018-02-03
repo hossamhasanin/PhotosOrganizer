@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.hasanin.hossam.photosorganiser.ImagesFragments.ShowImagesFragment;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.MainActivity;
 import com.hasanin.hossam.photosorganiser.R;
@@ -69,7 +70,15 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
             holder.stored_image_card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, imageRec.get(position).image));
+                    try {
+                        context.startActivity(new Intent(Intent.ACTION_VIEW, imageRec.get(position).image));
+                    }catch (Exception e){
+                        IndexingDB indexingDB = new IndexingDB(context);
+                        indexingDB.DeleteImage(String.valueOf(imageRec.get(position).id));
+                        imageRec.remove(position);
+                        notifyItemRemoved(position);
+                        TastyToast.makeText(context , "This image doesn't exist" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+                    }
                 }
             });
             holder.image_options.setOnClickListener(new View.OnClickListener() {
@@ -138,9 +147,16 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                 }
             });
         }
-        Glide.with(context).load(imageRec.get(position).image).into(holder.stored_image);
-        //holder.stored_image.setImageURI(imageRec.get(position).image);
+        //Glide.with(context).load(imageRec.get(position).image).into(holder.stored_image);
+        holder.stored_image.setImageURI(imageRec.get(position).image);
         holder.stored_image_name.setText(imageRec.get(position).image_name);
+        if (holder.stored_image.getDrawable() == null){
+            IndexingDB indexingDB = new IndexingDB(context);
+            indexingDB.DeleteImage(String.valueOf(imageRec.get(position).id));
+            holder.stored_image.setImageResource(R.drawable.image_not_found);
+            //Glide.with(context).load(R.drawable.image_not_found).into(holder.stored_image);
+            holder.stored_image_name.setText("Image not found");
+        }
     }
 
     @Override

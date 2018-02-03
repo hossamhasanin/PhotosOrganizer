@@ -131,6 +131,8 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
             Intent intent = new Intent(this , ImportImage.class);
             Bundle b = new Bundle();
             b.putString("image" , String.valueOf(data.getData()));
+            b.putInt("folder_id" , 0);
+            b.putString("folder_title" , "");
             intent.putExtras(b);
             startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
         } else if (requestCode == SAVE_IMAGE_IN_DATATBASE_CODE){
