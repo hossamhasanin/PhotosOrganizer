@@ -8,5 +8,5 @@
     app:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:id="@+id/toolbar"
     >
-
+<!-- ThemeOverlay.AppCompat.Dark -->
 </android.support.v7.widget.Toolbar>

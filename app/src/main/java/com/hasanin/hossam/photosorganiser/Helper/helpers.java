@@ -1,7 +1,16 @@
 package com.hasanin.hossam.photosorganiser.Helper;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +24,19 @@ import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
+import com.hasanin.hossam.photosorganiser.ImportImage;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragment;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
 import com.hasanin.hossam.photosorganiser.R;
 import com.sdsmdg.tastytoast.TastyToast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -35,6 +50,7 @@ public class helpers {
     public AlertDialog ad;
     public IndexingDB indexingDB;
     int selected_icon;
+    public Uri imageUri;
 
 
     public void CreateNewFolder (final Activity context , final ArrayList filesRec , final FileRecAdapter fileRecAdapter , final boolean bottombar , final BottomNavigationView bottomNavigationView){
@@ -215,6 +231,52 @@ public class helpers {
         AlertDialog.Builder al = new AlertDialog.Builder(context);
         al.setMessage(message).setIcon(icon).setTitle(title);
         return al;
+    }
+
+    public void takePhoto(Activity context){
+        int CAM_REQUEST_CODE = 600;
+        int WRITE_STORAGE_REQUEST_CODE = 700;
+        int TAKE_PICTURE_REQUEST_CODE = 800;
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_STORAGE_REQUEST_CODE);
+        } else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.CAMERA}, CAM_REQUEST_CODE);
+        } else {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Uri uriSavedImage = createImageUri();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
+            context.startActivityForResult(intent , TAKE_PICTURE_REQUEST_CODE);
+        }
+    }
+
+    public Uri createImageUri(){
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = "jpeg_" + timestamp + ".jpg";
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        // Create the image file
+        File file = new File(storageDir , fileName);
+        Uri uriSavedImage = Uri.fromFile(file);
+        imageUri = uriSavedImage;
+        return  uriSavedImage;
+    }
+
+    public static void saveImageToGallery(Activity context , Uri imageUri) {
+        // We call media scanner to inform the gallery that there is a new imgae has just taken and it need to be shown
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(imageUri);
+        context.sendBroadcast(intent);
+    }
+
+    // use it just in the mainActivity
+    public void moaveToImportImageActivity(Activity context , int SAVE_IMAGE_IN_DATATBASE_CODE , Intent data , Uri imageUri){
+        Intent intent = new Intent(context , ImportImage.class);
+        Bundle b = new Bundle();
+        b.putString("image" , data != null ? String.valueOf(data.getData()) : imageUri.toString());
+        b.putInt("folder_id" , 0);
+        b.putString("folder_title" , "");
+        intent.putExtras(b);
+        context.startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
     }
 
 

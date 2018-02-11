@@ -1,16 +1,20 @@
 package com.hasanin.hossam.photosorganiser.ShowImages;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,16 +151,27 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                 }
             });
         }
-        //Glide.with(context).load(imageRec.get(position).image).into(holder.stored_image);
-        holder.stored_image.setImageURI(imageRec.get(position).image);
-        holder.stored_image_name.setText(imageRec.get(position).image_name);
-        if (holder.stored_image.getDrawable() == null){
-            IndexingDB indexingDB = new IndexingDB(context);
-            indexingDB.DeleteImage(String.valueOf(imageRec.get(position).id));
-            holder.stored_image.setImageResource(R.drawable.image_not_found);
-            //Glide.with(context).load(R.drawable.image_not_found).into(holder.stored_image);
-            holder.stored_image_name.setText("Image not found");
+        ContentResolver cr = context.getContentResolver();
+        String[] projection = {MediaStore.MediaColumns.DATA};
+        Cursor cur = cr.query(imageRec.get(position).image, projection, null, null, null);
+        if (cur != null) {
+            if (cur.moveToFirst()) {
+                String imagePath = cur.getString(0);
+                System.out.println(imagePath);
+                if (new File(imagePath).exists()) {
+                    Glide.with(context).load(imageRec.get(position).image).into(holder.stored_image);
+                    //holder.stored_image.setImageURI(imageRec.get(position).image);
+                    holder.stored_image_name.setText(imageRec.get(position).image_name);
+                }
+            } else {
+                Glide.with(context).load(R.drawable.image_not_found).into(holder.stored_image);
+                holder.stored_image_name.setText("Image not found");
+                IndexingDB indexingDB = new IndexingDB(context);
+                indexingDB.DeleteImage(String.valueOf(imageRec.get(position).id));
+            }
+            cur.close();
         }
+
     }
 
     @Override

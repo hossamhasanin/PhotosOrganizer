@@ -3,7 +3,10 @@ package com.hasanin.hossam.photosorganiser;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -24,7 +27,12 @@ import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsL
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragment;
 import com.sdsmdg.tastytoast.TastyToast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements FoldersFragmentsListener {
 
@@ -32,10 +40,14 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
     private static final int REQUEST_STORAGE_PERM_FROM_BAR = 300;
     private static final int REQUEST_STORAGE_PERM_FROM_RECYC = 400;
+    private static final int CAM_REQUEST_CODE = 600;
+    private static final int WRITE_STORAGE_REQUEST_CODE = 700;
+    private static final int TAKE_PICTURE_REQUEST_CODE = 800;
 
     BottomNavigationView bottomNavigationView;
     ArrayList<FoldersModel> folders;
     IndexingDB indexingDB;
+    helpers helpers;
     //ShowFoldersFragment showFoldersFragment;
 
     @Override
@@ -46,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
         setSupportActionBar(toolbar);
         getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
         indexingDB = new IndexingDB(this);
+        helpers = new helpers();
 
         try {
             if (!getIntent().getStringExtra("show_no_folders_error").isEmpty()){
@@ -66,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
                         break;
                     case R.id.take_photo :
                         Toast.makeText(getApplicationContext() , "take photo" , Toast.LENGTH_SHORT).show();
+                        helpers.takePhoto(context);
                         break;
                     case R.id.import_image:
                         folders = indexingDB.GetAllFolders();
@@ -74,14 +88,14 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
                                 if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                     ActivityCompat.requestPermissions(context, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERM_FROM_BAR);
                                 } else {
-                                    MoveToShowImagesActivity();
+                                    getImageFromGallery();
                                 }
                             } else {
                                 TastyToast.makeText(getApplicationContext(), "There is no folders create one first !", TastyToast.LENGTH_SHORT, TastyToast.INFO);
                             }
                         } else {
                             if (folders.size() != 0) {
-                                MoveToShowImagesActivity();
+                                getImageFromGallery();
                             } else {
                                 TastyToast.makeText(getApplicationContext(), "There is no folders create one first !", TastyToast.LENGTH_SHORT, TastyToast.INFO);
                             }
@@ -98,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
 
     }
 
-    public void MoveToShowImagesActivity(){
+    public void getImageFromGallery(){
         //Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(intent , GET_IMAGE_CODE);
@@ -120,6 +134,18 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
                 } else {
                     TastyToast.makeText(getApplicationContext(), "Permission denied !", TastyToast.LENGTH_SHORT, TastyToast.ERROR);
                 }
+            case CAM_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                } else {
+                    TastyToast.makeText(getApplicationContext(), "Permission denied !", TastyToast.LENGTH_SHORT, TastyToast.ERROR);
+                }
+            case WRITE_STORAGE_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                } else {
+                    TastyToast.makeText(getApplicationContext(), "Permission denied !", TastyToast.LENGTH_SHORT, TastyToast.ERROR);
+                }
         }
     }
 
@@ -128,13 +154,7 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GET_IMAGE_CODE && resultCode == RESULT_OK){
-            Intent intent = new Intent(this , ImportImage.class);
-            Bundle b = new Bundle();
-            b.putString("image" , String.valueOf(data.getData()));
-            b.putInt("folder_id" , 0);
-            b.putString("folder_title" , "");
-            intent.putExtras(b);
-            startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
+            helpers.moaveToImportImageActivity(this, SAVE_IMAGE_IN_DATATBASE_CODE ,data , null);
         } else if (requestCode == SAVE_IMAGE_IN_DATATBASE_CODE){
             if (data.getExtras().getInt("success") == 1)
                 TastyToast.makeText(getApplicationContext(), "Saved successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
@@ -142,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
                 TastyToast.makeText(getApplicationContext(), "You escaped !", TastyToast.LENGTH_SHORT , TastyToast.CONFUSING);
 
             bottomNavigationView.setSelectedItemId(R.id.main_bar_item);
+        } else if (requestCode == TAKE_PICTURE_REQUEST_CODE && resultCode == RESULT_OK){
+            //Bitmap image = (Bitmap) data.getExtras().get("data");
+            helpers.saveImageToGallery(this , helpers.imageUri);
+            TastyToast.makeText(getApplicationContext(), "Take successfully ! , choose it now", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
+            //helpers.moaveToImportImageActivity(this, SAVE_IMAGE_IN_DATATBASE_CODE ,null , helpers.imageUri);
+            getImageFromGallery();
         }
 
     }

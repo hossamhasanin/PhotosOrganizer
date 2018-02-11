@@ -1,10 +1,14 @@
 package com.hasanin.hossam.photosorganiser.ImagesFragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +27,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
+import com.hasanin.hossam.photosorganiser.Helper.helpers;
 import com.hasanin.hossam.photosorganiser.ImportImage;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.MainActivity;
@@ -33,6 +38,7 @@ import com.hasanin.hossam.photosorganiser.ShowImages.ImagesFragmentsListener;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.sdsmdg.tastytoast.TastyToast;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import me.toptas.fancyshowcase.DismissListener;
@@ -63,7 +69,9 @@ public class ShowImagesFragment extends Fragment {
     ArrayList<FoldersModel> folders;
     private static final int REQUEST_STORAGE_PERM = 300;
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
+    private static final int TAKE_PICTURE_REQUEST_CODE = 800;
     FancyShowCaseView mFancyShowCaseView;
+    helpers helpers;
 
     public void setData(String folder_title , int folder_id , int previous_pos){
         this.folder_title = folder_title;
@@ -87,6 +95,7 @@ public class ShowImagesFragment extends Fragment {
 
         show_images = (RecyclerView) view.findViewById(R.id.show_images);
         indexingDB = new IndexingDB(getActivity());
+        helpers = new helpers();
         all_images = indexingDB.GetAllImages(Integer.toString(folder_id));
         imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Main" , -1);
         show_images.setAdapter(imageRecAdapter);
@@ -135,10 +144,10 @@ public class ShowImagesFragment extends Fragment {
                         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERM);
                         } else {
-                            MoveToShowImagesActivity();
+                            getImageFromGallery();
                         }
                     } else {
-                        MoveToShowImagesActivity();
+                        getImageFromGallery();
                     }
                     mFancyShowCaseView.hide();
                 }
@@ -147,14 +156,25 @@ public class ShowImagesFragment extends Fragment {
             takeImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TastyToast.makeText(getActivity() , "Take image" , TastyToast.LENGTH_SHORT , TastyToast.INFO);
+                    int CAM_REQUEST_CODE = 600;
+                    int WRITE_STORAGE_REQUEST_CODE = 700;
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_STORAGE_REQUEST_CODE);
+                    } else if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, CAM_REQUEST_CODE);
+                    } else {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        Uri uriSavedImage = helpers.createImageUri();
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
+                        startActivityForResult(intent , TAKE_PICTURE_REQUEST_CODE);
+                    }
                 }
             });
 
         }
     };
 
-    public void MoveToShowImagesActivity(){
+    public void getImageFromGallery(){
         //Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(intent , GET_IMAGE_CODE);
@@ -181,6 +201,11 @@ public class ShowImagesFragment extends Fragment {
             }else {
                 TastyToast.makeText(getActivity(), "You escaped !", TastyToast.LENGTH_SHORT, TastyToast.CONFUSING);
             }
+        } else if (requestCode == TAKE_PICTURE_REQUEST_CODE && resultCode == RESULT_OK){
+            //Bitmap image = (Bitmap) data.getExtras().get("data");
+            TastyToast.makeText(getActivity(), "Take successfully ! , choose it now", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
+            helpers.saveImageToGallery(getActivity() , helpers.imageUri);
+            getImageFromGallery();
         }
 
     }

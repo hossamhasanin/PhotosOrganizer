@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
 import com.sdsmdg.tastytoast.TastyToast;
@@ -41,12 +42,13 @@ public class ImportImage extends AppCompatActivity {
     Activity context;
     int SAVE_IMAGE_IN_DATATBASE_CODE = 200;
     Uri image_uri;
+    Bundle data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_image);
-        Bundle data = getIntent().getExtras();
+        data = getIntent().getExtras();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (data.getInt("folder_id") == 0) {
@@ -81,7 +83,8 @@ public class ImportImage extends AppCompatActivity {
         imported_image = (ImageView) findViewById(R.id.imported_image);
         image_name = (EditText) findViewById(R.id.image_name);
 
-        imported_image.setImageURI(image_uri);
+        //imported_image.setImageURI(image_uri);
+        Glide.with(this).load(image_uri).into(imported_image);
 
         final ArrayList<FoldersModel> all_folders = indexingDB.GetAllFolders();
         selected_folder  = data.getInt("folder_id") != 0 ? data.getInt("folder_id") : all_folders.get(0).id;
