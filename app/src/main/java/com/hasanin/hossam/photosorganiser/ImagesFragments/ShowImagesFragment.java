@@ -205,7 +205,15 @@ public class ShowImagesFragment extends Fragment {
             //Bitmap image = (Bitmap) data.getExtras().get("data");
             TastyToast.makeText(getActivity(), "Take successfully ! , choose it now", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
             helpers.saveImageToGallery(getActivity() , helpers.imageUri);
-            getImageFromGallery();
+            Uri imageContentUri = helpers.getImageContentUri(getActivity() , helpers.imageUri.getPath());
+            //getImageFromGallery();
+            Intent intent = new Intent(getActivity() , ImportImage.class);
+            Bundle b = new Bundle();
+            b.putString("image" , data != null ? String.valueOf(data.getData()) : imageContentUri.toString());
+            b.putInt("folder_id" , folder_id);
+            b.putString("folder_title" , folder_title);
+            intent.putExtras(b);
+            startActivityForResult(intent , SAVE_IMAGE_IN_DATATBASE_CODE);
         }
 
     }

@@ -165,9 +165,11 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
         } else if (requestCode == TAKE_PICTURE_REQUEST_CODE && resultCode == RESULT_OK){
             //Bitmap image = (Bitmap) data.getExtras().get("data");
             helpers.saveImageToGallery(this , helpers.imageUri);
-            TastyToast.makeText(getApplicationContext(), "Take successfully ! , choose it now", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
-            //helpers.moaveToImportImageActivity(this, SAVE_IMAGE_IN_DATATBASE_CODE ,null , helpers.imageUri);
-            getImageFromGallery();
+            Uri imageContentUri = helpers.getImageContentUri(this , helpers.imageUri.getPath());
+            //Toast.makeText(this , imageContentUri.toString() , Toast.LENGTH_LONG).show();
+            //TastyToast.makeText(getApplicationContext(), "Take successfully ! , choose it now", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
+            helpers.moaveToImportImageActivity(this, SAVE_IMAGE_IN_DATATBASE_CODE ,null , imageContentUri);
+            //getImageFromGallery();
         }
 
     }
