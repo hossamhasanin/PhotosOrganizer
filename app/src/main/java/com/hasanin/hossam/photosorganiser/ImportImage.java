@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersSpinnerArrayAdapter;
+import com.hasanin.hossam.photosorganiser.Helper.helpers;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
@@ -122,8 +123,10 @@ public class ImportImage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 v.startAnimation(scale_up);
-                indexingDB.InsertNewImage(image_name.getText().toString() , image_uri , selected_folder);
-                finishMoveBack(1);
+                if (helpers.storingImageRestrictions(context , image_name.getText().toString())){
+                    indexingDB.InsertNewImage(image_name.getText().toString() , image_uri , selected_folder);
+                    finishMoveBack(1);
+                }
             }
         });
 

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Indexing</string>
+    <string name="edit_image_title">Edit image name :</string>
 </resources>

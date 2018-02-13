@@ -208,6 +208,7 @@ public class helpers {
     }
 
     public boolean CreateFolderInstructions(Activity context){
+        IndexingDB indexingDB = new IndexingDB(context);
         if (folder_name.getText().toString().isEmpty()){
             TastyToast.makeText(context , "Write name to the folder !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
             return false;
@@ -222,6 +223,23 @@ public class helpers {
         }
         if (folder_name.getText().toString().length() < 3){
             TastyToast.makeText(context , "The name is too short !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean storingImageRestrictions(Activity context , String finalImageName){
+        IndexingDB indexingDB = new IndexingDB(context);
+        if (finalImageName.isEmpty()){
+            TastyToast.makeText(context , "Write name to the folder !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        if (indexingDB.imageNameExists(finalImageName)){
+            TastyToast.makeText(context , "This image name exists !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        if (finalImageName.length() > 30){
+            TastyToast.makeText(context , "Write name is less than 30 chatacters !" , TastyToast.LENGTH_LONG , TastyToast.ERROR);
             return false;
         }
         return true;

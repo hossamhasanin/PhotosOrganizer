@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_image_title"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:padding="15px" />
+
+    <TextView
+        android:id="@+id/currentImageNmae"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Old name"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:gravity="center" />
+
+    <EditText
+        android:id="@+id/newImageName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Image name"
+        android:layout_margin="10px"/>
+    <Button
+        android:id="@+id/editImageName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="save"
+        android:backgroundTint="@color/colorAccent"
+        android:textColor="@android:color/white"
+        android:layout_margin="10px"/>
+
+</LinearLayout>

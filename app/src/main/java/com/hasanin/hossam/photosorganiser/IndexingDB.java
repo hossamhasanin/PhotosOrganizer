@@ -105,7 +105,18 @@ public class IndexingDB extends SQLiteOpenHelper {
 
     public boolean FolderNameExist(String folder_name){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE name = '"+folder_name+"'" , null);
+        Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE type = 0 AND name = '"+folder_name+"'" , null);
+        data.moveToFirst();
+        if (data.getInt(0) == 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean imageNameExists(String imageName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE type = 1 AND name = '"+imageName+"'" , null);
         data.moveToFirst();
         if (data.getInt(0) == 1){
             return true;
@@ -153,6 +164,11 @@ public class IndexingDB extends SQLiteOpenHelper {
         }catch (Exception e){
             System.out.println(e);
         }
+    }
+
+    public void updateImageName(String id , String imageName){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("update container set name = '"+ imageName + "' where type = 1 AND id = " + id);
     }
 
 }
