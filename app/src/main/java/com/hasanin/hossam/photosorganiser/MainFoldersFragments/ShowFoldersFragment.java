@@ -22,8 +22,6 @@ import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
-import com.hasanin.hossam.photosorganiser.Princess.princessMessage;
-import com.hasanin.hossam.photosorganiser.Princess.princessQuestion;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
 
@@ -89,9 +87,6 @@ public class ShowFoldersFragment extends Fragment {
             Toast.makeText(getActivity() , "Will make new folder" , Toast.LENGTH_LONG).show();
             helpers helpers = new helpers();
             helpers.CreateNewFolder(getActivity() , filesRec , fileRecAdapter , false , (BottomNavigationView) null);
-        } if (item_id == R.id.to_princess){
-            startActivity(new Intent(getActivity() , princessQuestion.class));
-            getActivity().finish();
         }
         return super.onOptionsItemSelected(item);
     }

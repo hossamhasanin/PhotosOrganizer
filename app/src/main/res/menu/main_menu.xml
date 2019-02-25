@@ -14,8 +14,4 @@
         app:showAsAction="always"
         android:title="take a photo"
         ></item>
-    <item
-        android:id="@+id/to_princess"
-        android:title="To Princess"
-        ></item>
 </menu>

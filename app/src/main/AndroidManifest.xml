@@ -36,8 +36,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ShowImages.ShowImages" />
-        <activity android:name=".Princess.princessQuestion" />
-        <activity android:name=".Princess.princessMessage" />
         <activity android:name=".ImageViewer.ImageViewer" />
         <activity android:name=".ImagesFragments.TransferImage"></activity>
     </application>
