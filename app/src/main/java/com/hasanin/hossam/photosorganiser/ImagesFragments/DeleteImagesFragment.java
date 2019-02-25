@@ -5,9 +5,11 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +33,7 @@ import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by mohamed on 14/01/2018.
@@ -47,6 +50,10 @@ public class DeleteImagesFragment extends Fragment {
     int folder_id;
     ImagesFragmentsListener imagesFragmentsListener;
     int future_pos;
+    GridLayoutManager gridLayoutManager;
+    SharedPreferences sharedPreferences;
+    int spanCount;
+
     public void setData(int future_pos , int folder_id){
         this.future_pos = future_pos;
         this.folder_id = folder_id;
@@ -58,7 +65,11 @@ public class DeleteImagesFragment extends Fragment {
         View view = inflater.inflate(R.layout.show_images , container , false);
         this.setHasOptionsMenu(true);
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        if (Locale.getDefault().getDisplayLanguage().equals("English") || Locale.getDefault().getDisplayLanguage().equals(Locale.ENGLISH)){
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        }else {
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_right);
+        }
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,9 +80,11 @@ public class DeleteImagesFragment extends Fragment {
         show_images = (RecyclerView) view.findViewById(R.id.show_images);
         indexingDB = new IndexingDB(getActivity());
         all_images = indexingDB.GetAllImages(Integer.toString(folder_id));
-        imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Delete" , future_pos);
+        imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Delete" , future_pos , folder_id , folder_title);
         show_images.setAdapter(imageRecAdapter);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity() , 1);
+        sharedPreferences = getActivity().getSharedPreferences("images_style" , Context.MODE_PRIVATE);
+        spanCount = sharedPreferences.getInt("spanCount" , 1);
+        gridLayoutManager = new GridLayoutManager(getActivity() , spanCount);
         show_images.setLayoutManager(gridLayoutManager);
         gridLayoutManager.scrollToPosition(future_pos);
 
@@ -81,6 +94,11 @@ public class DeleteImagesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.delete_images_menu , menu);
+        if (spanCount == 1) {
+            menu.findItem(R.id.show_style).setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_span_3));
+        } else {
+            menu.findItem(R.id.show_style).setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_span_1));
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -109,8 +127,36 @@ public class DeleteImagesFragment extends Fragment {
                 }
             });
             al.show();
+        } else if(item_id == R.id.show_style) {
+            if (spanCount == 1){
+                spanCount = 2;
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("spanCount" , spanCount);
+                editor.commit();
+                switchRecUi(spanCount);
+                switchIcon(1 , item);
+            } else {
+                spanCount = 1;
+                switchRecUi(spanCount);
+                switchIcon(2 , item);
+            }
+        } else if(item_id == R.id.transfer){
+
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void switchIcon(int spanCount , MenuItem item) {
+        if (spanCount == 1){
+            item.setIcon(ContextCompat.getDrawable(getActivity() , R.drawable.ic_span_1));
+        } else {
+            item.setIcon(ContextCompat.getDrawable(getActivity() , R.drawable.ic_span_3));
+        }
+    }
+
+    private void switchRecUi(int spanCount) {
+        gridLayoutManager.setSpanCount(spanCount);
+        imageRecAdapter.notifyItemRangeChanged(0 , imageRecAdapter.getItemCount());
     }
 
     public void deleteImages(){

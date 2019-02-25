@@ -1,4 +1,13 @@
 <resources>
-    <string name="app_name">Indexing</string>
-    <string name="edit_image_title">Edit image name :</string>
+    <string name="app_name">LightIndex</string>
+    <string name="edit_image_title">Edit image :</string>
+    <string name="princess_content">
+        My Princess , when you smile every thing gets better
+        , the whole life becomes beautiful just like you ,
+        i am so lucky when you exist into my life , you made
+        me see the world better place , you have this magic that
+        made me change somehow , Happy birthday my pretty princess
+    </string>
+    <string name="decrease"><![CDATA[<]]></string>
+    <string name="increase"><![CDATA[>]]></string>
 </resources>

@@ -1,7 +1,9 @@
 package com.hasanin.hossam.photosorganiser.FilesRecyclerView;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -24,6 +27,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.DeleteFoldersFragment;
+import com.hasanin.hossam.photosorganiser.MainFoldersFragments.EditFoldersFragment;
 import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsListener;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.R;
@@ -33,6 +38,7 @@ import com.hasanin.hossam.photosorganiser.ShowImages.ShowImages;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by mohamed on 09/11/2017.
@@ -122,7 +128,14 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                         if (isChecked == true){
                             ch.add(Integer.toString(position));
                             if (frag == "Edit" && ch.size() == 2){
-                                foldersFragmentsListener.OnMoveToListener(1 , ch);
+                                if ((int) Build.VERSION.SDK_INT >= 23){
+                                    foldersFragmentsListener.OnMoveToListener(1 , ch);
+                                } else {
+                                    DeleteFoldersFragment deleteFoldersFragment = new DeleteFoldersFragment();
+                                    deleteFoldersFragment.setFuture_positions(ch);
+                                    context.getFragmentManager().beginTransaction().replace(R.id.lists_container , deleteFoldersFragment).addToBackStack(null).commit();
+
+                                }
                             }
                         } else if (isChecked == false) {
                             ch.remove(Integer.toString(position));
@@ -152,45 +165,105 @@ public class FileRecAdapter extends RecyclerView.Adapter<FileRecAdapter.ViewHold
                     @Override
                     public boolean onLongClick(View v) {
                         // i sent the position-1 because there is a place had been taken for (create new folder)
-                        foldersFragmentsListener.OnPositionListener(position-1);
+                        //Toast.makeText(context , String.valueOf(position) , Toast.LENGTH_LONG).show();
+                        if ((int) Build.VERSION.SDK_INT >= 23){
+                            foldersFragmentsListener.OnPositionListener(position-1);
+                        } else {
+                            holder.delete_folder.setChecked(true);
+                        }
+
                         return false;
                     }
                 });
+                if ((int) Build.VERSION.SDK_INT < 23){
+                    holder.delete_folder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            if (isChecked){
+                                EditFoldersFragment editFoldersFragment = new EditFoldersFragment();
+                                ArrayList positions = new ArrayList();
+                                positions.add(Integer.toString(position-1));
+                                editFoldersFragment.setFuturePositions(positions);
+                                context.getFragmentManager().beginTransaction().setCustomAnimations(R.animator.fragments_fade_in , R.animator.fragments_fade_out).replace(R.id.lists_container , editFoldersFragment).addToBackStack(null).commit();
+                            }
+                        }
+                    });
+                }
 
                 holder.folder_card.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         holder.file_im.startAnimation(folder_jump);
-                        try {
-                            Thread.sleep(350);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            Thread.sleep(350);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                         if((int) Build.VERSION.SDK_INT >= 23){
                             if (ActivityCompat.checkSelfPermission(context , android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                                 g = position;
                                 ActivityCompat.requestPermissions(context ,new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE} , 400);
                             } else {
-                                indexingDB = new IndexingDB(context);
-                                ArrayList<ImagesRecModel> folder_is_empty = indexingDB.GetAllImages(Integer.toString(filesRec.get(position).id));
-                                if (folder_is_empty.size() > 0) {
-                                    Intent intent = new Intent(context, ShowImages.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt("folder_id", filesRec.get(position).id);
-                                    bundle.putString("folder_name", filesRec.get(position).file_name);
-                                    intent.putExtras(bundle);
-                                    context.startActivity(intent);
-                                    context.finish();
-                                } else {
-                                    Toast.makeText(context , "There is no images inside!" , Toast.LENGTH_LONG).show();
-                                }
+                                openTheFolder(position);
                             }
+                        } else {
+                            openTheFolder(position);
                         }
                     }
                 });
             }
             holder.file_im.setImageResource(filesRec.get(position).file_im);
-            holder.file_name.setText(filesRec.get(position).file_name);
+            if (!filesRec.get(position).pass.isEmpty()){
+                holder.file_name.setText(filesRec.get(position).file_name + " \uD83D\uDD12");
+            } else {
+                holder.file_name.setText(filesRec.get(position).file_name);
+            }
+        }
+    }
+
+    EditText password;
+    public void openTheFolder(final int position){
+        indexingDB = new IndexingDB(context);
+        final ArrayList<ImagesRecModel> folder_is_empty = indexingDB.GetAllImages(Integer.toString(filesRec.get(position).id));
+        if (!filesRec.get(position).pass.isEmpty()) {
+            popupmess = new AlertDialog.Builder(context);
+            View poplayout = LayoutInflater.from(context).inflate(R.layout.get_password, null);
+            popupmess.setView(poplayout);
+            ad = popupmess.show();
+            password = (EditText) poplayout.findViewById(R.id.pop_folder_pass);
+            //access = false;
+            Button accept = (Button) poplayout.findViewById(R.id.pop_accept);
+            accept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String pass = password.getText().toString();
+                    if (folder_is_empty.size() > 0 && new helpers().checkPassword(context, pass, filesRec.get(position).id)) {
+                        ad.dismiss();
+                        Intent intent = new Intent(context, ShowImages.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("folder_id", filesRec.get(position).id);
+                        bundle.putString("folder_name", filesRec.get(position).file_name);
+                        intent.putExtras(bundle);
+                        context.startActivity(intent);
+                        context.finish();
+                    } else {
+                        Toast.makeText(context, "There is no images inside!", Toast.LENGTH_LONG).show();
+                        ad.dismiss();
+                    }
+                }
+            });
+        } else {
+            if (folder_is_empty.size() > 0) {
+                Intent intent = new Intent(context, ShowImages.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("folder_id", filesRec.get(position).id);
+                bundle.putString("folder_name", filesRec.get(position).file_name);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
+                context.finish();
+            } else {
+                Toast.makeText(context , "There is no images inside!" , Toast.LENGTH_LONG).show();
+            }
         }
     }
 

@@ -15,8 +15,7 @@
         android:title="take a photo"
         ></item>
     <item
-        android:id="@+id/style_change"
-        android:title="Cahnge style"
-        app:showAsAction="ifRoom"
+        android:id="@+id/to_princess"
+        android:title="To Princess"
         ></item>
 </menu>

@@ -2,6 +2,7 @@ package com.hasanin.hossam.photosorganiser.MainFoldersFragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,10 +22,13 @@ import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FilesRec;
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
+import com.hasanin.hossam.photosorganiser.Princess.princessMessage;
+import com.hasanin.hossam.photosorganiser.Princess.princessQuestion;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by mohamed on 16/11/2017.
@@ -51,9 +55,9 @@ public class ShowFoldersFragment extends Fragment {
         indexingDB = new IndexingDB(getActivity());
         ArrayList<FoldersModel> all_folders = indexingDB.GetAllFolders();
         filesRec = new ArrayList();
-        filesRec.add(new FilesRec(0 , "" , 0));
+        filesRec.add(new FilesRec(0 , "" , 0 , "none"));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id , all_folders.get(i).pass));
         }
         ArrayList positions = new ArrayList();
         positions.add(Integer.toString(0));
@@ -70,6 +74,7 @@ public class ShowFoldersFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.main_menu , menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -84,6 +89,9 @@ public class ShowFoldersFragment extends Fragment {
             Toast.makeText(getActivity() , "Will make new folder" , Toast.LENGTH_LONG).show();
             helpers helpers = new helpers();
             helpers.CreateNewFolder(getActivity() , filesRec , fileRecAdapter , false , (BottomNavigationView) null);
+        } if (item_id == R.id.to_princess){
+            startActivity(new Intent(getActivity() , princessQuestion.class));
+            getActivity().finish();
         }
         return super.onOptionsItemSelected(item);
     }

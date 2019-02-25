@@ -1,41 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/edit_image_title"
         android:gravity="center"
+        android:padding="15px"
+        android:text="@string/edit_image_title"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        android:padding="15px" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/currentImageNmae"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Old name"
-        android:textSize="16sp"
         android:textColor="@android:color/black"
-        android:gravity="center" />
+        android:textSize="16sp" />
 
     <EditText
         android:id="@+id/newImageName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Image name"
-        android:layout_margin="10px"/>
+        android:layout_margin="10px"
+        android:hint="Image name" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/decrease"
+            android:layout_width="61dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/decrease" />
+
+        <TextView
+            android:id="@+id/position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:text="1"
+            android:textColor="#000"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/increase"
+            android:layout_width="59dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/increase" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/editImageName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="save"
+        android:layout_margin="10px"
         android:backgroundTint="@color/colorAccent"
-        android:textColor="@android:color/white"
-        android:layout_margin="10px"/>
+        android:text="save"
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

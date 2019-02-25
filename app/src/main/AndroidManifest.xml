@@ -4,12 +4,16 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_ALL_DOWNLOADS" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/light_index"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -22,14 +26,20 @@
         </activity>
         <activity android:name=".Main2Activity" />
         <activity android:name=".Main3Activity" />
-        <activity android:name=".ImportImage" >
+        <activity android:name=".ImportImage">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-        <activity android:name=".ShowImages.ShowImages"></activity>
+        <activity android:name=".ShowImages.ShowImages" />
+        <activity android:name=".Princess.princessQuestion" />
+        <activity android:name=".Princess.princessMessage" />
+        <activity android:name=".ImageViewer.ImageViewer" />
+        <activity android:name=".ImagesFragments.TransferImage"></activity>
     </application>
 
 </manifest>

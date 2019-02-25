@@ -19,8 +19,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FilesRecyclerView.FileRecAdapter;
@@ -34,12 +38,15 @@ import com.hasanin.hossam.photosorganiser.MainFoldersFragments.ShowFoldersFragme
 import com.hasanin.hossam.photosorganiser.R;
 import com.sdsmdg.tastytoast.TastyToast;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 import static android.content.ContentValues.TAG;
@@ -51,6 +58,9 @@ import static android.content.ContentValues.TAG;
 public class helpers {
     public AlertDialog.Builder popupmess;
     public EditText folder_name;
+    public EditText folder_pass;
+    public CheckBox setPass;
+    public LinearLayout setPassContainer;
     public Spinner folder_icons;
     public AlertDialog ad;
     public IndexingDB indexingDB;
@@ -66,15 +76,15 @@ public class helpers {
         folder_icons = (Spinner) poplayout.findViewById(R.id.popup_spinner);
 
         final ArrayList<FoldersModel> FolderIcons = new ArrayList<FoldersModel>();
-        FolderIcons.add(new FoldersModel("random" , R.drawable.if_help_mark_query_question_support_talk , 0));
-        FolderIcons.add(new FoldersModel("acorn" , R.drawable.if_acorn , 0));
-        FolderIcons.add(new FoldersModel("adim" , R.drawable.if_adium , 0));
-        FolderIcons.add(new FoldersModel("coda" , R.drawable.if_coda , 0));
-        FolderIcons.add(new FoldersModel("deviant" , R.drawable.if_deviant , 0));
-        FolderIcons.add(new FoldersModel("indesign" , R.drawable.if_indesign , 0));
-        FolderIcons.add(new FoldersModel("front row" , R.drawable.if_front_row , 0));
-        FolderIcons.add(new FoldersModel("inkscape" , R.drawable.if_inkscape , 0));
-        FolderIcons.add(new FoldersModel("the pirate" , R.drawable.if_thepirate , 0));
+        FolderIcons.add(new FoldersModel("random" , R.drawable.if_help_mark_query_question_support_talk , 0 , "none"));
+        FolderIcons.add(new FoldersModel("acorn" , R.drawable.if_acorn , 0 , "none"));
+        FolderIcons.add(new FoldersModel("adim" , R.drawable.if_adium , 0 , "none"));
+        FolderIcons.add(new FoldersModel("coda" , R.drawable.if_coda , 0 , "none"));
+        FolderIcons.add(new FoldersModel("deviant" , R.drawable.if_deviant , 0 , "none"));
+        FolderIcons.add(new FoldersModel("indesign" , R.drawable.if_indesign , 0 , "none"));
+        FolderIcons.add(new FoldersModel("front row" , R.drawable.if_front_row , 0 , "none"));
+        FolderIcons.add(new FoldersModel("inkscape" , R.drawable.if_inkscape , 0 , "none"));
+        FolderIcons.add(new FoldersModel("the pirate" , R.drawable.if_thepirate , 0 , "none"));
 
         FoldersSpinnerArrayAdapter foldersSpinnerArrayAdapter = new FoldersSpinnerArrayAdapter(context , R.layout.popup_spinner_layout , R.id
                 .chosen_folder_icon_name, FolderIcons);
@@ -94,7 +104,32 @@ public class helpers {
 
 
         folder_name = (EditText) poplayout.findViewById(R.id.pop_folder_name);
+        setPass = (CheckBox) poplayout.findViewById(R.id.set_pass);
+        setPassContainer = (LinearLayout) poplayout.findViewById(R.id.set_pass_container);
+        folder_pass = (EditText) poplayout.findViewById(R.id.pop_folder_pass);
         Button create_folder = (Button) poplayout.findViewById(R.id.pop_create_folder);
+
+        setPassContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (setPass.isChecked()){
+                    setPass.setChecked(false);
+                } else {
+                    setPass.setChecked(true);
+                }
+            }
+        });
+        setPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    folder_pass.setVisibility(View.VISIBLE);
+                } else {
+                    folder_pass.setVisibility(View.GONE);
+                }
+            }
+        });
+
         indexingDB = new IndexingDB(context);
         final int[] ImageFolders = {R.drawable.if_acorn , R.drawable.if_adium , R.drawable.if_coda , R.drawable.if_deviant , R.drawable.if_indesign , R.drawable.if_front_row , R.drawable.if_inkscape , R.drawable.if_thepirate};
         create_folder.setOnClickListener(new View.OnClickListener() {
@@ -106,12 +141,13 @@ public class helpers {
                 }
 
                 String fn = folder_name.getText().toString();
+                String fpass = folder_pass.getText().toString();
                 Integer fp = filesRec.size();
                 if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                     selected_icon = GetRandomChoice(ImageFolders);
-                indexingDB.InsertNewFolder(fn , selected_icon);
+                indexingDB.InsertNewFolder(fn , selected_icon , fpass);
                 int id = indexingDB.GetLastRecordId();
-                filesRec.add(fp ,new FilesRec(selected_icon , fn , id));
+                filesRec.add(fp ,new FilesRec(selected_icon , fn , id , fpass));
                 TastyToast.makeText(context, "Created successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
                 // To add the new item to the list to make it show
                 fileRecAdapter.notifyItemInserted(fp);
@@ -124,23 +160,26 @@ public class helpers {
         });
     }
 
-    public void EditFolder (final Activity context , final ArrayList<FilesRec> filesRec , final FileRecAdapter fileRecAdapter , String f_name , int f_icon){
+    public void EditFolder (final Activity context , final ArrayList<FilesRec> filesRec , final FileRecAdapter fileRecAdapter , String f_name , int f_icon , final String f_pass){
         popupmess = new AlertDialog.Builder(context);
         View poplayout = LayoutInflater.from(context).inflate(R.layout.create_folder_mess , null);
         popupmess.setView(poplayout);
         ad = popupmess.show();
+        TextView messTitle = (TextView) poplayout.findViewById(R.id.mess_title);
+        messTitle.setText("Edit the folder");
+
         folder_icons = (Spinner) poplayout.findViewById(R.id.popup_spinner);
 
         final ArrayList<FoldersModel> FolderIcons = new ArrayList<FoldersModel>();
-        FolderIcons.add(new FoldersModel("random" , R.drawable.if_help_mark_query_question_support_talk , 0));
-        FolderIcons.add(new FoldersModel("acorn" , R.drawable.if_acorn , 0));
-        FolderIcons.add(new FoldersModel("adim" , R.drawable.if_adium , 0));
-        FolderIcons.add(new FoldersModel("coda" , R.drawable.if_coda , 0));
-        FolderIcons.add(new FoldersModel("deviant" , R.drawable.if_deviant , 0));
-        FolderIcons.add(new FoldersModel("indesign" , R.drawable.if_indesign , 0));
-        FolderIcons.add(new FoldersModel("front row" , R.drawable.if_front_row , 0));
-        FolderIcons.add(new FoldersModel("inkscape" , R.drawable.if_inkscape , 0));
-        FolderIcons.add(new FoldersModel("the pirate" , R.drawable.if_thepirate , 0));
+        FolderIcons.add(new FoldersModel("random" , R.drawable.if_help_mark_query_question_support_talk , 0 , "none"));
+        FolderIcons.add(new FoldersModel("acorn" , R.drawable.if_acorn , 0 , "none"));
+        FolderIcons.add(new FoldersModel("adim" , R.drawable.if_adium , 0 , "none"));
+        FolderIcons.add(new FoldersModel("coda" , R.drawable.if_coda , 0 , "none"));
+        FolderIcons.add(new FoldersModel("deviant" , R.drawable.if_deviant , 0 , "none"));
+        FolderIcons.add(new FoldersModel("indesign" , R.drawable.if_indesign , 0 , "none"));
+        FolderIcons.add(new FoldersModel("front row" , R.drawable.if_front_row , 0 , "none"));
+        FolderIcons.add(new FoldersModel("inkscape" , R.drawable.if_inkscape , 0 , "none"));
+        FolderIcons.add(new FoldersModel("the pirate" , R.drawable.if_thepirate , 0 , "none"));
 
         FoldersSpinnerArrayAdapter foldersSpinnerArrayAdapter = new FoldersSpinnerArrayAdapter(context , R.layout.popup_spinner_layout , R.id
                 .chosen_folder_icon_name, FolderIcons);
@@ -166,9 +205,40 @@ public class helpers {
         });
 
 
+        setPass = (CheckBox) poplayout.findViewById(R.id.set_pass);
+        setPassContainer = (LinearLayout) poplayout.findViewById(R.id.set_pass_container);
+        folder_pass = (EditText) poplayout.findViewById(R.id.pop_folder_pass);
+
+        setPassContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (setPass.isChecked()){
+                    setPass.setChecked(false);
+                } else {
+                    setPass.setChecked(true);
+                }
+            }
+        });
+        setPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    folder_pass.setVisibility(View.VISIBLE);
+                } else {
+                    folder_pass.setVisibility(View.GONE);
+                    folder_pass.setText("");
+                }
+            }
+        });
+        if (!f_pass.isEmpty()){
+            folder_pass.setText(f_pass);
+            setPass.setChecked(true);
+        }
+
         folder_name = (EditText) poplayout.findViewById(R.id.pop_folder_name);
         folder_name.setText(f_name);
         Button create_folder = (Button) poplayout.findViewById(R.id.pop_create_folder);
+        create_folder.setText("Save");
         indexingDB = new IndexingDB(context);
         final int[] ImageFolders = {R.drawable.if_acorn , R.drawable.if_adium , R.drawable.if_coda , R.drawable.if_deviant , R.drawable.if_indesign , R.drawable.if_front_row , R.drawable.if_inkscape , R.drawable.if_thepirate};
         create_folder.setOnClickListener(new View.OnClickListener() {
@@ -176,14 +246,16 @@ public class helpers {
             public void onClick(View v) {
                 if (!folder_name.getText().toString().isEmpty()){
                     String fn = folder_name.getText().toString();
+                    String fpass = folder_pass.getText().toString();
                     Integer fp = filesRec.size();
                     if (selected_icon == 0 || selected_icon == R.drawable.if_help_mark_query_question_support_talk)
                         selected_icon = GetRandomChoice(ImageFolders);
                     int pos = Integer.parseInt(fileRecAdapter.ch.get(0).toString());
                     int id = filesRec.get(pos).id;
-                    indexingDB.UpdateFolder(fn , Integer.toString(selected_icon) , Integer.toString(id));
-                    filesRec.set(pos , new FilesRec(selected_icon , fn , id));
+                    indexingDB.UpdateFolder(fn , Integer.toString(selected_icon) , Integer.toString(id) , fpass);
+                    filesRec.set(pos , new FilesRec(selected_icon , fn , id , f_pass));
                     fileRecAdapter.notifyItemChanged(pos);
+                    fileRecAdapter.notifyDataSetChanged();
                     TastyToast.makeText(context, "The edit has saved !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
                     MoveTo(context , "Edit" , fileRecAdapter.ch.get(0).toString());
                 }
@@ -192,6 +264,18 @@ public class helpers {
         });
     }
 
+    public boolean checkPassword(Activity context , String pass , int id){
+        IndexingDB indexingDB = new IndexingDB(context);
+        if (pass.isEmpty()){
+            TastyToast.makeText(context , "Write the password !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        } else if(!indexingDB.checkPassword(pass , id)) {
+            TastyToast.makeText(context , "The password is not correct !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }else {
+            return true;
+        }
+    }
 
     public void MoveTo(Activity context , String frag , String data){
         if (frag == "Main"){
@@ -217,12 +301,16 @@ public class helpers {
             TastyToast.makeText(context , "This name is exist !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
             return false;
         }
-        if (folder_name.getText().toString().length() > 20){
+        if (folder_name.getText().toString().length() > 80){
             TastyToast.makeText(context , "The name is too long !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
             return false;
         }
         if (folder_name.getText().toString().length() < 3){
             TastyToast.makeText(context , "The name is too short !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
+            return false;
+        }
+        if (folder_pass.getText().toString().isEmpty() && setPass.isChecked()){
+            TastyToast.makeText(context , "Write the password to the folder !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
             return false;
         }
         return true;
@@ -232,10 +320,6 @@ public class helpers {
         IndexingDB indexingDB = new IndexingDB(context);
         if (finalImageName.isEmpty()){
             TastyToast.makeText(context , "Write name to the folder !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
-            return false;
-        }
-        if (indexingDB.imageNameExists(finalImageName)){
-            TastyToast.makeText(context , "This image name exists !" , TastyToast.LENGTH_SHORT , TastyToast.ERROR);
             return false;
         }
         if (finalImageName.length() > 30){

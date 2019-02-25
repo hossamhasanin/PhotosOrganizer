@@ -27,6 +27,7 @@ import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by mohamed on 03/12/2017.
@@ -54,7 +55,11 @@ public class DeleteFoldersFragment extends Fragment {
         //getActivity().getActionBar().setTitle("Delete");
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        if (Locale.getDefault().getDisplayLanguage().equals("English") || Locale.getDefault().getDisplayLanguage().equals(Locale.ENGLISH)){
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        }else {
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_right);
+        }
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,7 +76,7 @@ public class DeleteFoldersFragment extends Fragment {
         filesRec = new ArrayList();
         //filesRec.add(new FilesRec(0 , ""));
         for (Integer i=0;i<all_folders.size();i++){
-            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id));
+            filesRec.add(new FilesRec(all_folders.get(i).icon , all_folders.get(i).icon_name , all_folders.get(i).id , all_folders.get(i).pass));
         }
         fileRecAdapter = new FileRecAdapter(filesRec , getActivity() , future_positions , "Delete" , foldersFragmentsListener);
         show_files.setAdapter(fileRecAdapter);

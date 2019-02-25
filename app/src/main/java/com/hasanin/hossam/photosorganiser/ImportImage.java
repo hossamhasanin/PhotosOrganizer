@@ -124,7 +124,7 @@ public class ImportImage extends AppCompatActivity {
             public void onClick(View v) {
                 v.startAnimation(scale_up);
                 if (helpers.storingImageRestrictions(context , image_name.getText().toString())){
-                    indexingDB.InsertNewImage(image_name.getText().toString() , image_uri , selected_folder);
+                    indexingDB.InsertNewImage(image_name.getText().toString() , image_uri , selected_folder , -1);
                     finishMoveBack(1);
                 }
             }

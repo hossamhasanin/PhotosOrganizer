@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context="com.hasanin.hossam.photosorganiser.ImportImage"
+    >
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/activity_import_img"
-    tools:context="com.hasanin.hossam.photosorganiser.ImportImage">
-
+    android:id="@+id/activity_import_img">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -26,7 +29,7 @@
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/btn_import"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
@@ -39,7 +42,7 @@
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/import_btn_close"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_margin="10dp"
@@ -56,14 +59,57 @@
                 app:srcCompat="@color/cardview_shadow_start_color" />
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/textView3"
+    <TextView
+        android:id="@+id/titleOfStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Chose folder :"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+
+    <Spinner
+        android:id="@+id/import_folders_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/bright_gray"
+        android:layout_margin="10dp"/>
+    <LinearLayout
+        android:id="@+id/existed_folder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/existed_folderIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Image name :"
+            app:srcCompat="@drawable/if_thepirate"
+            android:layout_gravity="left"/>
+
+        <TextView
+            android:id="@+id/existed_folderTile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="14dp"
+            android:text="Folder 1"
+            android:textAlignment="textStart"
             android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:layout_margin="10dp"/>
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Image name :"
+        android:textAlignment="textStart"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
         <EditText
             android:id="@+id/image_name"
             android:layout_width="match_parent"
@@ -76,43 +122,5 @@
             android:textSize="18sp"
             android:layout_margin="5dp"/>
 
-        <TextView
-            android:id="@+id/titleOfStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chose folder :"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:layout_margin="10dp"/>
-
-
-        <Spinner
-            android:id="@+id/import_folders_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@color/bright_gray"
-            android:layout_margin="10dp"/>
-        <LinearLayout
-            android:id="@+id/existed_folder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
-
-            <ImageView
-                android:id="@+id/existed_folderIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/if_thepirate" />
-            <TextView
-                android:id="@+id/existed_folderTile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Folder 1"
-                android:textSize="16sp"
-                android:layout_marginTop="14dp"
-                android:layout_marginLeft="10dp"
-                android:textColor="@android:color/black"/>
-
-        </LinearLayout>
-
 </LinearLayout>
+</ScrollView>

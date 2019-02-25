@@ -56,7 +56,11 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
+        if (getFragmentManager().findFragmentById(R.id.lists_container) != null){
+            getFragmentManager().beginTransaction().replace(R.id.lists_container , new ShowFoldersFragment()).commit();
+        }else{
+            getFragmentManager().beginTransaction().add(R.id.lists_container , new ShowFoldersFragment()).commit();
+        }
         indexingDB = new IndexingDB(this);
         helpers = new helpers();
 
@@ -176,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements FoldersFragmentsL
 
     @Override
     public void OnPositionListener(int position) {
-        Toast.makeText(this , "Chosen position is "+position , Toast.LENGTH_LONG).show();
         EditFoldersFragment editFoldersFragment = new EditFoldersFragment();
         ArrayList positions = new ArrayList();
         positions.add(Integer.toString(position));

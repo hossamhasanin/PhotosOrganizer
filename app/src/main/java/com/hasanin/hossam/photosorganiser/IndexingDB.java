@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.util.Log;
 
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
@@ -26,7 +27,7 @@ public class IndexingDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS `container` ( `id` INTEGER, `name` TEXT, `type` INTEGER DEFAULT 0, `place` INTEGER DEFAULT 0, `uri` TEXT,  PRIMARY KEY(`id`) ); ");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `container` ( `id` INTEGER, `name` TEXT, `type` INTEGER DEFAULT 0, `place` INTEGER DEFAULT 0, `uri` TEXT, `password` TEXT DEFAULT NULL , `position` INTEGER DEFAULT -1 ,  PRIMARY KEY(`id`) ); ");
     }
 
     @Override
@@ -35,13 +36,14 @@ public class IndexingDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean InsertNewFolder (String folder_name , int icon){
+    public boolean InsertNewFolder (String folder_name , int icon , String pass){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("name",folder_name);
         contentValues.put("type" , 0);
         contentValues.put("place" , 0);
         contentValues.put("uri" , Integer.toString(icon));
+        contentValues.put("password" , pass);
         Long result = db.insert("container" , null , contentValues);
         if (result == 1){
             return true;
@@ -50,13 +52,14 @@ public class IndexingDB extends SQLiteOpenHelper {
         }
     }
 
-    public boolean InsertNewImage (String image_name , Uri image , int place){
+    public boolean InsertNewImage (String image_name , Uri image , int place , int position){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("name",image_name);
         contentValues.put("type" , 1);
         contentValues.put("place" , place);
         contentValues.put("uri" , String.valueOf(image));
+        contentValues.put("position" , position);
         Long result = db.insert("container" , null , contentValues);
         if (result == 1){
             return true;
@@ -73,7 +76,7 @@ public class IndexingDB extends SQLiteOpenHelper {
         Cursor data = db.rawQuery("SELECT * FROM container WHERE type = 0", null);
         data.moveToFirst();
         while (data.isAfterLast() == false){
-            all_folders.add(new FoldersModel(data.getString(data.getColumnIndex("name")) , Integer.parseInt(data.getString(data.getColumnIndex("uri"))) , data.getInt(data.getColumnIndex("id")) ));
+            all_folders.add(new FoldersModel(data.getString(data.getColumnIndex("name")) , Integer.parseInt(data.getString(data.getColumnIndex("uri"))) , data.getInt(data.getColumnIndex("id")), data.getString(data.getColumnIndex("password"))));
             data.moveToNext();
         }
         return all_folders;
@@ -83,10 +86,10 @@ public class IndexingDB extends SQLiteOpenHelper {
         ArrayList<ImagesRecModel> all_images = new ArrayList<ImagesRecModel>();
         SQLiteDatabase db = this.getReadableDatabase();
         // type = 0 means folder
-        Cursor data = db.rawQuery("SELECT * FROM container WHERE type = 1 AND place = " + "'" +place+ "'", null);
+        Cursor data = db.rawQuery("SELECT * FROM container WHERE type = 1 AND place = " + "'" +place+ "' order by position ", null);
         data.moveToFirst();
         while (data.isAfterLast() == false){
-            all_images.add(new ImagesRecModel(Uri.parse(data.getString(data.getColumnIndex("uri"))) , data.getString(data.getColumnIndex("name")) , data.getInt(data.getColumnIndex("id")) ));
+            all_images.add(new ImagesRecModel(Uri.parse(data.getString(data.getColumnIndex("uri"))) , data.getString(data.getColumnIndex("name")) , data.getInt(data.getColumnIndex("id")) , data.getInt(data.getColumnIndex("position")) ));
             data.moveToNext();
         }
         return all_images;
@@ -114,6 +117,17 @@ public class IndexingDB extends SQLiteOpenHelper {
         }
     }
 
+    public boolean checkPassword(String pass , int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE id = "+id+" AND password = '"+pass+"'", null);
+        data.moveToFirst();
+        if (data.getInt(0) == 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean imageNameExists(String imageName){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor data = db.rawQuery("SELECT count(*) FROM container WHERE type = 1 AND name = '"+imageName+"'" , null);
@@ -132,9 +146,10 @@ public class IndexingDB extends SQLiteOpenHelper {
         return data.getInt(data.getColumnIndex("id"));
     }
 
-    public void UpdateFolder(String name , String icon , String id){
+
+    public void UpdateFolder(String name , String icon , String id , String pass){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("update container set name = '"+ name +"' , uri = '"+ icon +"' where type = 0 AND id = " + id);
+        db.execSQL("update container set name = '"+ name +"' , uri = '"+ icon +"' , password = '"+ pass +"' where type = 0 AND id = " + id);
     }
 
     public void DeleteImagesByItsPlace(String place){
@@ -166,9 +181,10 @@ public class IndexingDB extends SQLiteOpenHelper {
         }
     }
 
-    public void updateImageName(String id , String imageName){
+    public void updateImage(String id , String imageName , int position){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("update container set name = '"+ imageName + "' where type = 1 AND id = " + id);
+        db.execSQL("update container set name = '"+ imageName + "' , position = "+ position +" where type = 1 AND id = " + id);
+        Log.i("data" , String.valueOf(position));
     }
 
 }

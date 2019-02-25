@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -32,6 +33,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
+import com.hasanin.hossam.photosorganiser.ImageViewer.ImageViewer;
+import com.hasanin.hossam.photosorganiser.ImagesFragments.DeleteImagesFragment;
 import com.hasanin.hossam.photosorganiser.ImagesFragments.ShowImagesFragment;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
 import com.hasanin.hossam.photosorganiser.MainActivity;
@@ -53,13 +56,17 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
     int future_pos;
     public ArrayList<String> checked = new ArrayList<String>();
     IndexingDB indexingDB;
+    int folder_id;
+    String folder_title;
 
-    public ImageRecAdapter(ArrayList<ImagesRecModel> ImageRec , Activity context , ImagesFragmentsListener imagesFragmentsListener , String frag , int future_pos){
+    public ImageRecAdapter(ArrayList<ImagesRecModel> ImageRec , Activity context , ImagesFragmentsListener imagesFragmentsListener , String frag , int future_pos , int folder_id , String folder_title){
         this.context = context;
         this.imageRec = ImageRec;
         this.frag = frag;
         this.imagesFragmentsListener = imagesFragmentsListener;
         this.future_pos = future_pos;
+        this.folder_id = folder_id;
+        this.folder_title = folder_title;
     }
 
     @Override
@@ -76,15 +83,37 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
             holder.stored_image_card.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    imagesFragmentsListener.MoveToFragment("Delete" , position);
+                    if ((int) Build.VERSION.SDK_INT >= 23){
+                        imagesFragmentsListener.MoveToFragment("Delete" , position);
+                    } else {
+                        holder.stored_checked_image.setChecked(true);
+                    }
+
                     return false;
                 }
             });
+            if ((int) Build.VERSION.SDK_INT < 23){
+                holder.stored_checked_image.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        DeleteImagesFragment deleteImagesFragment = new DeleteImagesFragment();
+                        deleteImagesFragment.setData(position , folder_id);
+                        context.getFragmentManager().beginTransaction().replace(R.id.images_container , deleteImagesFragment).addToBackStack(null).commit();
+                    }
+                });
+            }
             holder.stored_image_card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
-                        context.startActivity(new Intent(Intent.ACTION_VIEW, imageRec.get(position).image));
+                        //context.startActivity(new Intent(Intent.ACTION_VIEW, imageRec.get(position).image));
+                        Intent intent = new Intent(context , ImageViewer.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("folder_id" , folder_id);
+                        bundle.putString("folder_name" , folder_title);
+                        bundle.putInt("position" , position);
+                        intent.putExtras(bundle);
+                        context.startActivity(intent);
                     }catch (Exception e){
                         //IndexingDB indexingDB = new IndexingDB(context);
                         indexingDB.DeleteImage(String.valueOf(imageRec.get(position).id));
@@ -159,7 +188,13 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                         checked.remove(Integer.toString(position));
                         holder.stored_image_card.setCardBackgroundColor(ContextCompat.getColor(context,R.color.checked));
                         if (checked.size() == 0){
-                            imagesFragmentsListener.MoveToFragment("Main" , position);
+                            if ((int) Build.VERSION.SDK_INT >= 23) {
+                                imagesFragmentsListener.MoveToFragment("Main", position);
+                            } else {
+                                ShowImagesFragment showImagesFragment = new ShowImagesFragment();
+                                showImagesFragment.setData(folder_title , folder_id , position);
+                                context.getFragmentManager().beginTransaction().replace(R.id.images_container , showImagesFragment).addToBackStack(null).commit();
+                            }
                         }
                     }
                 }
@@ -175,6 +210,8 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                 }
             });
         }
+
+
         // Get the real uri from content uri
         ContentResolver cr = context.getContentResolver();
         String[] projection = {MediaStore.MediaColumns.DATA};
@@ -187,6 +224,7 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
                     Glide.with(context).load(imageRec.get(position).image).into(holder.stored_image);
                     //holder.stored_image.setImageURI(imageRec.get(position).image);
                     holder.stored_image_name.setText(imageRec.get(position).image_name);
+                    Log.i("test" , String.valueOf(imageRec.get(position).position));
                 }
             } else {
                 Glide.with(context).load(R.drawable.image_not_found).into(holder.stored_image);
@@ -200,17 +238,21 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
     }
 
     String finalImageName;
-
+    int p = -1;
     public void editImage(final String currentImageName , final String id , final int pos , final ArrayList<ImagesRecModel> imageRec){
         AlertDialog.Builder ad = new AlertDialog.Builder(context);
         View editImage = LayoutInflater.from(context).inflate(R.layout.edit_image , null);
         ad.setView(editImage);
         final AlertDialog popup = ad.show();
         final TextView currentName = (TextView) editImage.findViewById(R.id.currentImageNmae);
+        final TextView position = (TextView) editImage.findViewById(R.id.position);
         final EditText newName = (EditText) editImage.findViewById(R.id.newImageName);
         Button saveChanges = (Button) editImage.findViewById(R.id.editImageName);
+        Button increasePos = (Button) editImage.findViewById(R.id.increase);
+        Button decreasePos = (Button) editImage.findViewById(R.id.decrease);
         currentName.setText(currentImageName);
         finalImageName = currentImageName;
+        newName.setText(currentImageName);
         newName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -229,13 +271,50 @@ public class ImageRecAdapter extends RecyclerView.Adapter<ImageRecAdapter.ViewHo
 
             }
         });
+
+
+
+        p = imageRec.get(pos).position;
+
+        position.setText(String.valueOf(p));
+
+        increasePos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (p < getItemCount()-1){
+                    p = p +1;
+                    position.setText(String.valueOf(p));
+                   // Log.i("p" , String.valueOf(p));
+                }
+            }
+        });
+        decreasePos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (p != 0){
+                    p = p -1;
+                    position.setText(String.valueOf(p));
+                }
+            }
+        });
         saveChanges.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (helpers.storingImageRestrictions(context , finalImageName)){
-                    indexingDB.updateImageName(id , finalImageName);
-                    imageRec.set(pos , new ImagesRecModel(imageRec.get(pos).image , finalImageName , Integer.parseInt(id)));
-                    notifyItemChanged(pos);
+                    Toast.makeText(context , String.valueOf(p) , Toast.LENGTH_SHORT).show();
+                    ImagesRecModel m = imageRec.get(pos);
+                    ImagesRecModel s = imageRec.get(p);
+                    indexingDB.updateImage(id , finalImageName , p);
+                    indexingDB.updateImage(String.valueOf(s.id) , s.image_name , pos);
+                    //imageRec.remove(m);
+                    //imageRec.remove(s);
+                    //imageRec.add(p , new ImagesRecModel(m.image , finalImageName , Integer.parseInt(id) , p));
+                    //imageRec.add(pos , new ImagesRecModel(s.image , finalImageName , Integer.parseInt(id) , pos));
+                    //notifyDataSetChanged();
+                    //notifyItemMoved(pos , p);
+                    //notifyDataSetChanged();
+                    //notifyItemChanged(p);
                 }
                 popup.dismiss();
             }

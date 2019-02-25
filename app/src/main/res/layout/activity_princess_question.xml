@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hasanin.hossam.photosorganiser.Princess.princessQuestion">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/lavender"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/question_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Who are you ?"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:layout_marginTop="150dp"
+        android:gravity="center"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/answer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/question_text"
+        android:padding="10dp"
+        android:hint="Who are you ?"
+        android:background="@android:color/white"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"/>
+
+    <Button
+        android:id="@+id/getEnter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter ->"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/colorAccent"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/answer"
+        android:layout_centerInParent="true"/>
+
+
+</RelativeLayout>

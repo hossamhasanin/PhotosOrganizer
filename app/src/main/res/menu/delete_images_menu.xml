@@ -8,4 +8,14 @@
         android:icon="@drawable/ic_delete_basket_white"
         app:showAsAction="ifRoom"
         android:title="Delete image"/>
+    <item
+        android:id="@+id/show_style"
+        android:title="style"
+        android:icon="@drawable/ic_span_3"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/transfer"
+        android:title="style"
+        android:icon="@drawable/ic_transfer"
+        app:showAsAction="always"/>
 </menu>

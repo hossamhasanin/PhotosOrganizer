@@ -6,7 +6,7 @@
 
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/mess_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -33,6 +33,33 @@
             android:hint="Folder name"
             android:inputType="textPersonName"
             android:padding="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/set_pass_container">
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/set_pass"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Password"
+                    android:textColor="#000"/>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/pop_folder_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:ems="10"
+            android:hint="Folder password"
+            android:inputType="textPersonName"
+            android:padding="10dp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/pop_create_folder"

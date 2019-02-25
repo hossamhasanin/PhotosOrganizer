@@ -3,45 +3,43 @@ package com.hasanin.hossam.photosorganiser.ImagesFragments;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 import com.hasanin.hossam.photosorganiser.FoldersSpinner.FoldersModel;
 import com.hasanin.hossam.photosorganiser.Helper.helpers;
 import com.hasanin.hossam.photosorganiser.ImportImage;
 import com.hasanin.hossam.photosorganiser.IndexingDB;
-import com.hasanin.hossam.photosorganiser.MainActivity;
-import com.hasanin.hossam.photosorganiser.MainFoldersFragments.FoldersFragmentsListener;
 import com.hasanin.hossam.photosorganiser.R;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImageRecAdapter;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesFragmentsListener;
 import com.hasanin.hossam.photosorganiser.ShowImages.ImagesRecModel;
 import com.sdsmdg.tastytoast.TastyToast;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
-import me.toptas.fancyshowcase.DismissListener;
 import me.toptas.fancyshowcase.FancyShowCaseView;
 import me.toptas.fancyshowcase.OnViewInflateListener;
 
@@ -72,6 +70,10 @@ public class ShowImagesFragment extends Fragment {
     private static final int TAKE_PICTURE_REQUEST_CODE = 800;
     FancyShowCaseView mFancyShowCaseView;
     helpers helpers;
+    GridLayoutManager gridLayoutManager;
+    SharedPreferences sharedPreferences;
+    int spanCount;
+    //CoordinatorLayout imagesRootView;
 
     public void setData(String folder_title , int folder_id , int previous_pos){
         this.folder_title = folder_title;
@@ -84,24 +86,33 @@ public class ShowImagesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_images , container , false);
         this.setHasOptionsMenu(true);
+        indexingDB = new IndexingDB(getActivity());
+        this.setHasOptionsMenu(true);
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        if (Locale.getDefault().getDisplayLanguage().equals("English") || Locale.getDefault().getDisplayLanguage().equals(Locale.ENGLISH)){
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        }else {
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_right);
+        }
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().onBackPressed();
             }
         });
+        //imagesRootView = (CoordinatorLayout) view.findViewById(R.id.show_images_container);
 
         show_images = (RecyclerView) view.findViewById(R.id.show_images);
-        indexingDB = new IndexingDB(getActivity());
-        helpers = new helpers();
         all_images = indexingDB.GetAllImages(Integer.toString(folder_id));
-        imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Main" , -1);
+        helpers = new helpers();
+        imageRecAdapter = new ImageRecAdapter(all_images , getActivity() , imagesFragmentsListener , "Main" , -1 , folder_id , folder_title);
         show_images.setAdapter(imageRecAdapter);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity() , 1);
+        sharedPreferences = getActivity().getSharedPreferences("images_style" , Context.MODE_PRIVATE);
+        spanCount = sharedPreferences.getInt("spanCount" , 1);
+        gridLayoutManager = new GridLayoutManager(getActivity() , spanCount);
         show_images.setLayoutManager(gridLayoutManager);
         gridLayoutManager.scrollToPosition(previous_pos);
+
 
         fabAddFab = (FloatingActionButton) view.findViewById(R.id.fab_add_fab);
 
@@ -121,6 +132,8 @@ public class ShowImagesFragment extends Fragment {
         return view;
     }
 
+
+    // region ViewInflaterListener
     OnViewInflateListener onViewInflateListener = new OnViewInflateListener() {
         @Override
         public void onViewInflated(View view) {
@@ -173,11 +186,58 @@ public class ShowImagesFragment extends Fragment {
 
         }
     };
+    //endregion
 
     public void getImageFromGallery(){
         //Toast.makeText(getApplicationContext() , "Import" , Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Intent.ACTION_PICK , MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(intent , GET_IMAGE_CODE);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.show_images_menu , menu);
+        if (spanCount == 1) {
+            menu.findItem(R.id.show_style).setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_span_3));
+        } else {
+            menu.findItem(R.id.show_style).setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_span_1));
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int item_id = item.getItemId();
+        switch (item_id){
+            case R.id.show_style:
+                if (spanCount == 1){
+                    spanCount = 2;
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("spanCount" , spanCount);
+                    editor.commit();
+                    switchRecUi(spanCount);
+                    switchIcon(1 , item);
+                } else {
+                    spanCount = 1;
+                    switchRecUi(spanCount);
+                    switchIcon(2 , item);
+                }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void switchIcon(int spanCount , MenuItem item) {
+        if (spanCount == 1){
+            item.setIcon(ContextCompat.getDrawable(getActivity() , R.drawable.ic_span_1));
+        } else {
+            item.setIcon(ContextCompat.getDrawable(getActivity() , R.drawable.ic_span_3));
+        }
+    }
+
+    private void switchRecUi(int spanCount) {
+        gridLayoutManager.setSpanCount(spanCount);
+        imageRecAdapter.notifyItemRangeChanged(0 , imageRecAdapter.getItemCount());
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -195,7 +255,7 @@ public class ShowImagesFragment extends Fragment {
             if (data.getExtras().getInt("success") == 1) {
                 TastyToast.makeText(getActivity(), "Saved successfully !", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS);
                 ArrayList<ImagesRecModel> allImages = indexingDB.GetAllImages(Integer.toString(folder_id));
-                ImageRecAdapter imageRecAdapter = new ImageRecAdapter(allImages, getActivity() , imagesFragmentsListener , "Main" , -1);
+                ImageRecAdapter imageRecAdapter = new ImageRecAdapter(allImages, getActivity() , imagesFragmentsListener , "Main" , -1 , folder_id , folder_title);
                 show_images.setAdapter(imageRecAdapter);
 
             }else {

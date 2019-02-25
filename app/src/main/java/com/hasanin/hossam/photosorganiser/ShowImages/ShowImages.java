@@ -48,7 +48,12 @@ public class ShowImages extends AppCompatActivity implements ImagesFragmentsList
         frag = "Main";
         showImagesFragment = new ShowImagesFragment();
         showImagesFragment.setData(data.getString("folder_name") , folder_id , 0);
-        getFragmentManager().beginTransaction().add(R.id.images_container , showImagesFragment).commit();
+        if (getFragmentManager().findFragmentById(R.id.lists_container) != null){
+            getFragmentManager().beginTransaction().replace(R.id.images_container , showImagesFragment).commit();
+        } else {
+            getFragmentManager().beginTransaction().add(R.id.images_container , showImagesFragment).commit();
+        }
+
 
 
     }
